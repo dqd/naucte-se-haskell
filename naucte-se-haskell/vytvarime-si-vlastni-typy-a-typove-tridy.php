@@ -1,7 +1,7 @@
 <div class="english-version"><a href="http://learnyouahaskell.com/making-our-own-types-and-typeclasses">English version</a></div>
 <h1><?=$contents[$_P[0]]['title']?></h1>
 <p>Předchozí kapitoly se týkaly několika existujích haskellových typů a typových tříd. V této kapitole se naučíme vytvářet si naše vlastní a jak s nimi pracovat!</p>
-<div class="translation">Tady <a href="http://dqd.cz/">překladatel</a> prozatím skončil. Můžete navštívit IRC kanál <a href="irc://irc.freenode.net/haskell.cz">#haskell.cz</a> a povzbudit ho.</div>
+<div class="translation">Tady <a href="http://dqd.cz/">překladatel</a> prozatím skončil. Můžete navštívit IRC kanál <a href="irc://irc.freenode.net/haskell.cz">#haskell.cz</a> a povzbudit ho, případně přímo přispět překladem na <a href="https://github.com/dqd/naucte-se-haskell">githubu</a>.</div>
 <a name="algebraicke-datove-typy"></a><h2><?=$contents[$_P[0]]['subchapters']['algebraicke-datove-typy']?></h2>
 <p>So far, we've run into a lot of data types. <span class="fixed">Bool</span>, <span class="fixed">Int</span>, <span class="fixed">Char</span>, <span class="fixed">Maybe</span>, etc. But how do we make our own? Well, one way is to use the <em>data</em> keyword to define a type. Let's see how the <span class="fixed">Bool</span> type is defined in the standard library.</p>
 <pre name="code" class="haskell:hs">
