@@ -1,0 +1,149 @@
+Stuff to include:
+* Getting started
+* Advantages of functional programming
+* Functions
+* Function application with $
+* Function composition
+* Lambdas
+* Recursion
+* Pattern matching
+* Higher order functions
+* Partial application
+* Lists
+    * Data.List
+* Tuples
+* Thinking functional
+* Types
+    * Typeclasses
+    * ADTs
+    * Type synonims
+    * newtype
+    * Type declaration
+    * Inference
+* Maps
+* Input/Output
+* Syntax
+    * let in syntax
+    * guards
+    * where
+* Monads
+    * List
+    * State
+    * Maybe
+* Arrows
+* Monad Transformers
+
+---------------------------------
+Introduction
+    - About this tutorial
+        * Previous knowledge needed
+        * Thinking differently, quitting
+        * On the usefulness of #haskell
+        * Acknowledgements
+    - So what's Haskell?
+        * Functional programming
+        * What to do vs. what stuff is
+        * Lazyness
+        * Thinking in data transformations
+        * Every function is dependent only on its arguments
+        * The type system
+    - What you need to dive in
+        * Installing ghc
+        * Using ghci and loading scripts
+
+Starting Out
+    - Let's use some functions
+        * Basic calculator stuff
+        * Using some prelude functions
+    - Baby's first functions
+        * Making a simple function
+        * Combining functions
+        * Precedence
+    - Lists
+        * Using some functions on lists
+        * Enumerations in lists
+        * Strings
+        * Some infinite lists
+        * List comprehensions
+    - Tuples
+
+Types and Classes
+    - Type declarations
+    - Some basic types
+    - Class constraints
+    - Some basic classes
+        * How classes are like interfaces
+        * Classes vs. inheritance trees
+    - Inference
+        * Type coercion
+
+Syntax in Functions
+    - Pattern matching
+    - guards
+    - let clauses
+    - where clauses
+    - case
+    - indentation
+
+Recursion
+    - Thinking recursively
+
+Higher order functions
+    - Curried functions
+    - Partial Application
+    - Lambdas
+    - Maps and Filters
+    - Folds
+    - Function application with $
+    - Function composition
+
+Modules And Data Structures
+    - On modules
+    - Data.List
+    - Data.Map
+    - Data.Set
+    - Data.Array
+
+Making Our Own Types And Classes
+    - ADTs
+    - Type parameters
+    - Type constructors vs. Value constructors
+    - Derivation
+    - Type synonyms
+    - Making typeclasses
+        * Basics on making classes
+        * Matching free type variables and classes, partial application
+    - Newtype
+    - Kinds
+
+Input and Output
+    - Reading standard input
+    - Writing standard output
+    - Reading files
+    - Writing files
+
+Functionally solving problems
+
+Monads 
+    - What Monads Are
+    - Monadic laws
+    - Do notation
+    - IO
+    - Maybe
+    - State
+    - List
+    - Error
+    - Reader
+    - Writer
+    - Making a monad 
+
+Arrows
+
+Functors
+
+Monad transformers
+    - About monad transformers
+    - StateT with a Maybe and Error
+    - ReaderT
+    - Lifting
+    - Transformer stacks
