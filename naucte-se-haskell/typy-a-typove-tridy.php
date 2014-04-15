@@ -1,7 +1,7 @@
 <div class="english-version"><a href="http://learnyouahaskell.com/types-and-typeclasses">English version</a></div>
 <h1><?=$contents['typy-a-typove-tridy']['title']?></h1>
 <a name="verte-typum"></a><h2>Věřte typům</h2>
-<img src="cow.png" alt="búú" class="left" width="180" height="127">
+<img src="images/cow.png" alt="búú" class="left" width="180" height="127">
 <p>
 Již jsme zmínili, že Haskell má statický typový systém. Typ každého výrazu je znám už v době překladu, což vede k bezpečnějšímu kódu. Pokud napíšete program, kde se pokusíte dělit booleovský typ číslem, ani se ho nepodaří přeložit. To je dobré, protože je lepší odchytávat chyby tohoto druhu v čase překladu než aby program havaroval. Všechno v Haskellu má svůj typ, takže toho překladač ví o vašem programu celkem hodně, než ho vůbec začne překládat.
 </p>
@@ -27,7 +27,7 @@ ghci&gt; :t 4 == 5
 4 == 5 :: Bool
 </pre>
 <p>
-<img src="bomb.png" alt="bomba" class="right" width="171" height="144">
+<img src="images/bomb.png" alt="bomba" class="right" width="171" height="144">
 Zde vidíme, že napsáním <span class="fixed">:t</span> a výrazu vypíše zadaný výraz, následovaný <span class="fixed">::</span> a jeho typem. Čtyři tečky <span class="fixed">::</span> se čtou jako „má typ“. Explicitní typy jsou vždy označovány tak, že mají počáteční písmeno velké. Výraz <span class="fixed">'a'</span>, jak můžeme vidět, má typ <span class="fixed">Char</span>. Není těžké usoudit, že se jedná o znak (<i>character</i>). Výraz <span class="fixed">True</span> je typu <span class="fixed">Bool</span>. To dává smysl. Ale co je tohle? Prozkoumání typu výrazu <span class="fixed">"NAZDAR!"</span> vypsalo <span class="fixed">[Char]</span>. Hranaté závorky symbolizují seznam. Takže to čteme jako <i>seznam znaků</i>. Na rozdíl od seznamů, každá n-tice určité délky (arity) má svůj vlastní typ. Takže výraz <span class="fixed">(True, 'a')</span> má typ <span class="fixed">(Bool, Char)</span>, kdežto výraz jako <span class="fixed">('a','b','c')</span> by měl mít typ <span class="fixed">(Char, Char, Char)</span>. Výraz <span class="fixed">4 == 5</span> bude vždycky vracet <span class="fixed">False</span>, tedy je typu <span class="fixed">Bool</span>.
 </p>
 <p>
@@ -107,7 +107,7 @@ ghci&gt; :t head
 head :: [a] -&gt; a
 </pre>
 <p>
-<img src="box.png" alt="krabice" class="left" width="130" height="93">
+<img src="images/box.png" alt="krabice" class="left" width="130" height="93">
 Hmmm! Co je to <span class="fixed">a</span>? Je to typ? Vzpomeňte si, že jsme předtím tvrdili, že typy se zapisují velkým počátečním písmenem, takže to není zrovna typ. Protože to není napsáno velkým písmenem, je to ve skutečnosti <em>typová proměnná</em>. Což znamená, že <span class="fixed">a</span> může být jakéhokoliv typu. Je to podobné jako generika v jiných jazycích, jenomže haskellová typová proměnná je mnohem užitečnější, protože nám umožňuje jednoduše psát obecné funkce, pokud není potřeba určitých typových specifik. Funkce, které obsahují typové proměnné, se nazývají <em>polymorfní funkce</em>. Typová deklarace funkce <span class="fixed">head</span> uvádí, že vezme seznam libovolného typu a vrací jeden prvek stejného typu.
 </p>
 <p>
@@ -124,7 +124,7 @@ fst :: (a, b) -&gt; a
 Vidíme, že <span class="fixed">fst</span> vezme n-tici, jež obsahuje dva typy a vrátí prvek stejného typu, jaký má první složka. To je důvod, proč můžeme použít <span class="fixed">fst</span> na dvojici, která obsahuje jakékoliv dva typy. Všimněte si, že ačkoliv jsou <span class="fixed">a</span> a <span class="fixed">b</span> různé typové proměnné, nemusí mít rozdílný typ. Pouze to uvádí, že je typ první složky a návratové hodnoty stejný.
 </p>
 <a name="zaklady-typovych-trid"></a><h2>Základy typových tříd</h2>
-<img src="classes.png" alt="třída" class="right" width="210" height="158">
+<img src="images/classes.png" alt="třída" class="right" width="210" height="158">
 <p>
 Typová třída je druh rozhraní, které definuje nějaké chování. Pokud je typ součástí nějaké typové třídy, znamená to, že podporuje a implementuje chování, jež ta typová třída definuje. Hodně lidí, co někdy programovalo v objektově orientovaných jazycích, je zmatených, protože si myslí, že jsou stejné jako objektové třídy. No, nejsou. Můžete je považovat za taková lepší javová rozhraní.
 </p>

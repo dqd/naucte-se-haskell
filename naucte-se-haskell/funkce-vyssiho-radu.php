@@ -1,6 +1,6 @@
 <div class="english-version"><a href="http://learnyouahaskell.com/higher-order-functions">English version</a></div>
 <h1 style="margin-left:-3px">Funkce vyššího řádu</h1>
-<img src="sun.png" alt="sluníčko" class="right" width="203" height="183">
+<img src="images/sun.png" alt="sluníčko" class="right" width="203" height="183">
 <p>
 Funkce v Haskellu mohou mít jako parametr jiné funkce a stejně tak mohou být funkce návratovou hodnotou. Funkce, která provádí obě tyhle věci se nazývá funkce vyššího řádu. Funkce vyššího řádu nejsou jenom součástí haskellové praxe, ony jsou v podstatě haskellovou praxí. Ukazuje se, že když chceme zadávat výpočty pomocí definování věcí jaké <i>jsou</i>, místo definování kroků, které změní nějaké stavy a možná pomocí cyklů, funkce vyššího řádu jsou nezbytné. Je to velice silný nástroj na řešení problémů a způsob myšlení o programech.
 </p>
@@ -17,7 +17,7 @@ ghci&gt; (max 4) 5
 <p class="hintbox">
 <em>Poznámka překladatele</em>: pojem <i>curryfikace</i> je pojmenován (stejně jako tento programovací jazyk) podle amerického matematika a logika Haskella Curryho. Protože nebyla ustálena pravopisná podoba slova, lze se setkat i s alternativními verzemi <i>currifikace</i> nebo <i>curryifikace</i>, které označují tu stejnou věc. Curryfikace se zdá být nejsprávnější variantou.
 </p>
-<img src="curry.png" alt="haskell curry" class="left" width="160" height="238">
+<img src="images/curry.png" alt="haskell curry" class="left" width="160" height="238">
 <p>
 Vložená mezera mezi dvěma věcmi je jednoduše <b>aplikace funkce</b>. Mezera je něco jako operátor a má nejvyšší prioritu. Podívejme se na typ funkce <span class="fixed">max</span>. Je <span class="fixed">max :: (Ord a) =&gt; a -&gt; a -&gt; a</span>. To může být také zapsáno jako <span class="fixed">max :: (Ord a) =&gt; a -&gt; (a -&gt; a)</span>. Což bychom mohli číst: <span class="fixed">max</span> vezme <span class="fixed">a</span> a vrátí (to je ta šipka <span class="fixed">-&gt;</span>) funkci, která vezme nějaké <span class="fixed">a</span> a vrátí <span class="fixed">a</span>. To je důvod, proč jsou návratový typ a parametry funkce vždy odděleny pomocí šipek.
 </p>
@@ -100,7 +100,7 @@ Funkce mohou mít jako parametry funkce a také vracet funkce. Abychom si to obj
 applyTwice :: (a -&gt; a) -&gt; a -&gt; a
 applyTwice f x = f (f x)
 </pre>
-<img src="bonus.png" alt="rocková chobotnice" class="right" width="166" height="190">
+<img src="images/bonus.png" alt="rocková chobotnice" class="right" width="166" height="190">
 <p>
 Jako první si všimněte deklarace typu. Předtím jsme nepotřebovali závorky, protože šipka <span class="fixed">-&gt;</span> je sama o sobě asociativní zprava. Nicméně tady jsou povinné. Ukazují, že první parametr je funkce, která něco vezme a vrátí tu stejnou věc. Druhým parametrem je něco stejného typu a co má návratovou hodnotu stejného typu. Mohli bychom číst tuhle typovou deklaci curryfikovaným způsobem, ale abychom se vyhnuli bolení hlavy, řekneme prostě, že tahle funkce vezme dva parametry a vrátí jednu věc. Prvním parametrem je nějaká funkce (typu <span class="fixed">a -&gt; a</span>) a druhý má jako typ to stejné <span class="fixed">a</span>. První funkce může být třeba <span class="fixed">Int -&gt; Int</span> nebo <span class="fixed">String -&gt; String</span> nebo cokoliv jiného. Ale druhý parametr pak musí být stejného typu.
 </p>
@@ -245,7 +245,7 @@ quicksort (x:xs) =
         biggerSorted = quicksort (filter (&gt;x) xs)
     in  smallerSorted ++ [x] ++ biggerSorted
 </pre>
-<img src="map.png" alt="mapa" class="left" width="210" height="115">
+<img src="images/map.png" alt="mapa" class="left" width="210" height="115">
 <p>
 Mapování a filtrování jsou živobytím nářadí funkcionálního programátora. Hm. Nezáleží na tom, jestli budete využívat spíše funkce <span class="fixed">map</span> a <span class="fixed">filter</span> oproti generátoru seznamu. Vzpomeňte si, jak jsme řešili problém hledání pravoúhlých trojúhelníků s určitým obvodem. V imperativním programování bychom to mohli vyřešit zanořením tří smyček a následným testováním, jestli aktuální kombinace dá dohromady pravoúhlý trojúhelník a jestli má správný obvod. Pokud by to byl ten případ, mohli bychom to vytisknout na obrazovku nebo něco. Ve funkcionálním programování se tohoto schématu dá docílit mapováním a filtrováním. Vytvoříte si funkci, která vezme nějakou hodnotu a vyprodukuje nějaký výsledek. Namapujeme tuhle funkci na seznam hodnot a poté z něj odfiltrujeme vyhovující výsledky. I když něco namapujeme na seznam vícekrát a poté to několikrát odfiltrujeme projde to díky lenosti Haskellu tím seznamem pouze jednou.
 </p>
@@ -325,7 +325,7 @@ ghci&gt; (listOfFuns !! 4) 5
 Získání prvku s indexem <span class="fixed">4</span> z našeho seznamu vrátí funkci, která odpovídá <span class="fixed">(*4)</span>. A poté jednoduše aplikujeme číslo <span class="fixed">5</span> na tu funkci. Takže je to stejné jako napsání <span class="fixed">(* 4) 5</span> nebo prostě <span class="fixed">5 * 4</span>.
 </p>
 <a name="lambdy"></a><h2>Lambdy</h2>
-<img src="lambda.png" alt="lambda" class="right" width="203" height="230">
+<img src="images/lambda.png" alt="lambda" class="right" width="203" height="230">
 <p>
 Lambdy jsou v zásadě anonymní funkce, které jsou používané, protože často potřebujeme nějakou funkci jenom jednou. Obvykle si vytváříme lambdu, abychom ji předali funkci vyššího řádu. Pro vytvoření lambdy napíšeme znak <span class="fixed">\</span> (protože vypadá jako řecké písmeno lambda, když na něj pořádně zamžouráte) a poté napíšeme parametry, oddělené mezerami. Za tím následuje šipka <span class="fixed">-&gt;</span> a tělo funkce. Obvykle to celé obklopíme kulatými závorkami, protože jinak to má sahá dál napravo.
 </p>
@@ -339,7 +339,7 @@ numLongChains = length (filter (\xs -&gt; length xs &gt; 15) (map chain [1..100]
 <p>
 Lambdy jsou výrazy, to je důvod, proč je můžeme jen tak předat. Výraz <span class="fixed">(\xs -&gt; length xs &gt; 15)</span> vrátí funkci, která nám poví, jaké seznamy jsou delší než 15.
 </p>
-<img src="lamb.png" alt="jehně" class="left" width="200" height="134">
+<img src="images/lamb.png" alt="jehně" class="left" width="200" height="134">
 <p>
 Lidé, jež nejsou důkladně obeznámeni s tím, jak curryfikace a částečná aplikace funguje, často používají lambdy tam, kde nemusí být. Kupříkladu výrazy <span class="fixed">map (+3) [1,6,3,2]</span> a <span class="fixed">map (\x -&gt; x + 3) [1,6,3,2]</span> jsou ekvivalentní, protože <span class="fixed">(+3)</span> a <span class="fixed">(\x -&gt; x + 3)</span> jsou obě funkce, co vezmou nějaké číslo a přičtou k němu trojku. Netřeba dodávat, že v tomhle případě je používat lambdu hloupé, jelikož je částečná aplikace mnohem čitelnější.
 </p>
@@ -382,7 +382,7 @@ flip' f = \x y -&gt; f y x
 Ačkoliv to je stejné, jako když napíšeme <span class="fixed">flip' f x y = f y x</span>, ozřejmíme tím, že to bude většinou použito pro vytvoření nové funkce. Nejobvyklejší použití funkce <span class="fixed">flip</span> je zavolat ji pouze s jedním parametrem a předat výslednou funkci pomocí mapy nebo filtru. Takže používejte lambda funkce tímhle způsobem, když chcete zdůraznit, že je vaše funkce určená pro částečnou aplikaci a pro předání jiné funkci jako parametr.
 </p>
 <a name="akumulacni-funkce-fold"></a><h2>Akumulační funkce fold</h2>
-<img src="origami.png" alt="origami" class="right" width="220" height="221">
+<img src="images/origami.png" alt="origami" class="right" width="220" height="221">
 <p>
 Když jsme se předtím zabývali rekurzí, všímali jsme si schématu u mnoha rekurzivních funkcí, které zacházejí se seznamy. Obvykle jsme měli okrajový případ pro prázdný seznam. Představili jsme si vzor <span class="fixed">x:xs</span> a poté jsme prováděli určité akce týkající se  prvku a zbytku seznamu. Ukázalo se, že to je velmi častý vzor, takže bylo zavedeno pár užitečných funkcí, které ho zapouzdřují. Těmto funkcím se říká foldy (skládače). Jsou podobné funkci <span class="fixed">map</span>, akorát omezují seznam na nějakou jednu hodnotu.
 </p>
@@ -406,7 +406,7 @@ Zkouška, raz, dva, tři:
 ghci&gt; sum' [3,5,2,1]
 11
 </pre>
-<img src="foldl.png" alt="foldl" class="left" width="172" height="348">
+<img src="images/foldl.png" alt="foldl" class="left" width="172" height="348">
 <p>
 Podíváme se do hloubky, co se při tomto vyhodnocování děje. Funkce <span class="fixed">\acc x -&gt; acc + x</span> je binární. Počáteční hodnota je tu <span class="fixed">0</span> a <span class="fixed">xs</span> je seznam, který bude poskládán. Na začátku je dosazeno číslo <span class="fixed">0</span> na místo parametru <span class="fixed">acc</span> v binární funkci a číslo <span class="fixed">3</span> je (jako současný prvek) dosazeno na místo parametru <span class="fixed">x</span>. Sečtení <span class="fixed">0 + 3</span> vytvoří číslo <span class="fixed">3</span> a to se stane novou akumulační hodnotou, dá-li se to tak říct. Dále je použité číslo <span class="fixed">3</span> jako akumulační hodnota a číslo <span class="fixed">5</span> jako aktuální prvek a tím pádem se číslo <span class="fixed">8</span> stane novým akumulátorem. Pokračujeme, máme parametry <span class="fixed">8</span> a <span class="fixed">2</span>, nová akumulační hodnota je tedy <span class="fixed">10</span>. A nakonec je použito číslo <span class="fixed">10</span> jako akumulační hodnota a číslo <span class="fixed">1</span> jako aktuální prvek, což vytvoří číslo <span class="fixed">11</span>. Gratuluji, zvládli jsme skládání!
 </p>
@@ -446,7 +446,7 @@ Jestliže namapujeme funkci <span class="fixed">(+3)</span> na seznam <span clas
 <p>
 Samozřejmě bychom si mohli napsat tuhle funkci pomocí levého foldu. Bylo by to <span class="fixed">map' f xs = foldl (\acc x -&gt; acc ++ [f x]) [] xs</span>, ale problém je v tom, že funkce <span class="fixed">++</span> mnohem náročnější než <span class="fixed">:</span>, takže obvykle používáme pravé foldy na sestavování nových seznamů ze seznamu.
 </p>
-<img src="washmachine.png" alt="pračka" class="right" width="250" height="205">
+<img src="images/washmachine.png" alt="pračka" class="right" width="250" height="205">
 <p>
 Když obrátíte seznam, můžete na něj použít pravý fold místo levého a naopak. Někdy ho ani nemusíte obracet. Funkce <span class="fixed">sum</span> může být implementována prakticky stejně pomocí levého a pravého foldu. Hlavní rozdíl je v tom, že pravý fold může pracovat s nekonečnými seznamy, kdežto levý ne! Pro objasnění, pokud někdy vezmete nekonečný seznam od určitého místa a začnete ho skládat zprava, dostanete se časem na začátek toho seznamu. Nicméně pokud vezmete nekonečný seznam od určitého místa a zkusíte ho skládat zleva, nikdy se nedostanete na konec!
 </p>
@@ -526,7 +526,7 @@ Dále se podíváme na funkci <span class="fixed">$</span>, která se také naz�
 ($) :: (a -&gt; b) -&gt; a -&gt; b
 f $ x = f x
 </pre>
-<img src="dollar.png" alt="dolar" class="left" width="180" height="136">
+<img src="images/dollar.png" alt="dolar" class="left" width="180" height="136">
 <p>
 Co to sakra je? Co je tohle za neužitečný operátor? Je to jenom aplikovaná funkce! No skoro, ale nejen to! Zatímco obyčejná aplikace funkce (vložení mezery mezi dvě věci) má celkem vysokou prioritu, funkce <span class="fixed">$</span> má prioritu nejnižší. Aplikace funkce pomocí mezery je asociativní zleva (takže <span class="fixed">f a b c</span> je to stejné co <span class="fixed">((f a) b) c)</span>), aplikace funkce pomocí <span class="fixed">$</span> je asociativní zprava.
 </p>
@@ -545,7 +545,7 @@ ghci&gt; map ($ 3) [(4+), (10*), (^2), sqrt]
 </pre>
 <a name="skladani-funkci"></a><h2>Skládání funkcí</h2>
 <p>
-V matematice je skládání funkcí (kompozice) definováno takto: <img src="composition.png" alt="(f . g)(x) = f(g(x))">, což znamená, že skládání dvou funkcí vytvoří novou funkci, kterou když zavoláme s parametrem, řekněme <i>x</i>, je ekvivalentní zavolání funkce <i>g</i> s parametrem <i>x</i> a poté zavolání funkce <i>f</i> na výsledek.
+V matematice je skládání funkcí (kompozice) definováno takto: <img src="images/composition.png" alt="(f . g)(x) = f(g(x))">, což znamená, že skládání dvou funkcí vytvoří novou funkci, kterou když zavoláme s parametrem, řekněme <i>x</i>, je ekvivalentní zavolání funkce <i>g</i> s parametrem <i>x</i> a poté zavolání funkce <i>f</i> na výsledek.
 </p>
 <p>
 V Haskellu je skládání funkcí v podstatě stejná věc. Pro skládání funkcí používáme funkci <span class="fixed">.</span>, jež je definována následovně:
@@ -554,7 +554,7 @@ V Haskellu je skládání funkcí v podstatě stejná věc. Pro skládání funk
 (.) :: (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 f . g = \x -&gt; f (g x)
 </pre>
-<img src="notes.png" alt="noty" class="left" width="230" height="198">
+<img src="images/notes.png" alt="noty" class="left" width="230" height="198">
 <p>
 Popřemýšlejte nad typovou deklarací. Funkce <span class="fixed">f</span> musí mít jako parametr hodnotu se stejným typem jako je typ návratové hodnoty <span class="fixed">g</span>. Takže výsledná funkce vezme parametr stejného typu jako požaduje <span class="fixed">g</span> a vrátí hodnotu shodného typu, jako vrací <span class="fixed">f</span>. Výraz <span class="fixed">negate . (* 3)</span> vrací funkci, která vezme nějaké číslo, vynásobí ho trojkou a poté zneguje.
 </p>

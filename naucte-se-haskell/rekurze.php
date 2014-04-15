@@ -1,7 +1,7 @@
 <div class="english-version"><a href="http://learnyouahaskell.com/recursion">English version</a></div>
 <h1 style="margin-left:-2px">Rekurze</h1>
 <a name="ahoj-rekurze"></a><h2>Ahoj, rekurze!</h2>
-<img src="recursion.png" alt="SOVĚTSKÉ RUSKO" class="left" width="250" height="179">
+<img src="images/recursion.png" alt="SOVĚTSKÉ RUSKO" class="left" width="250" height="179">
 <p>
 Rekurzi jsme stručně zmínili v předchozí kapitole. V této kapitole se na ni podíváme zblízka, proč je v Haskellu tak důležitá a jak můžeme najít velice výstižná a elegantní řešení problémů díky rekurzivnímu myšlení.
 </p>
@@ -48,7 +48,7 @@ maximum' (x:xs) = max x (maximum' xs)
 <p>
 To je ale elegantní! Maximum ze seznamu je v podstatě <span class="fixed">max</span> z prvního prvku a maxima ze zbytku.
 </p>
-<img src="maxs.png" alt="max" class="center" width="651" height="267">
+<img src="images/maxs.png" alt="max" class="center" width="651" height="267">
 <a name="nekolik-dalsich-rekurzivnich-funkci"></a><h2>Několik dalších rekurzivních funkcí</h2>
 <p>
 A teď, když víme, jak se zhruba dá myslet rekurzivně, napišme si pár funkcí s použitím rekurze. Nejprve si implementujeme funkci <span class="fixed">replicate</span>. Tato funkce vezme parametr typu <span class="fixed">Int</span> a nějaký prvek a vrátí seznam, který má několik opakování toho stejného prvku. Kupříkladu <span class="fixed">replicate 3 5</span> vrátí <span class="fixed">[5,5,5]</span>. Zamysleme se nad okrajovou podmínkou. Můj tip je, že okrajová podmínka je 0 nebo méně. Jestliže zkusíme opakovat něco nulakrát, měl by se vrátit prázdný seznam. Stejně pro záporná čísla, protože to nedává moc smysl.
@@ -73,7 +73,7 @@ take' n _
 take' _ []     = []
 take' n (x:xs) = x : take' (n-1) xs
 </pre>
-<img src="painter.png" alt="malíř" class="right" width="350" height="276">
+<img src="images/painter.png" alt="malíř" class="right" width="350" height="276">
 <p>
 První vzor uvádí, že pokud zkusíme vzít 0 nebo záporný počet prvků, dostaneme prázdný seznam. Všimněte si, že jsme použili <span class="fixed">_</span> na ověření seznamu, protože nás v tomhle případě ten seznam nezajímá. Také si všimněte použití stráže bez části <span class="fixed">otherwise</span>. Jestliže se tím pádem ukáže, že <span class="fixed">n</span> je větší než 0, ověření selže a přejde se na další vzor. Druhý vzor naznačuje, že pokud chceme vzít cokoliv z prázdného sezamu, dostaneme prázdný seznam. Třetí vzor rozdělí seznam na první prvek a zbytek. A poté uvedeme, že když vezmeme <span class="fixed">n</span> prvků ze seznamu, je to stejné jako sezam, který obsahuje první prvek  <span class="fixed">x</span> a poté seznam <span class="fixed">n-1</span> prvků ze zbytku. Zkuste si vzít kus papíru, abyste si zapsali, jak by mohlo vypadat vyhodnocování, řekněme, tří prvků ze seznamu <span class="fixed">[4,3,2,1]</span>.
 </p>
@@ -127,7 +127,7 @@ Poměrně jednoduché a očekávatelné. Jestliže není první prvek stejný ja
 <p>
 Máme seznam věcí, které mohou být seřazeny. Jejich typ je instancí typové třídy <span class="fixed">Ord</span>. A teď bychom je chtěli seřadit! Existuje bezvadný řadící algoritmus, nazvaný quicksort. Je to velice chytrý způsob pro řazení věcí. Zatímco je potřeba více než 10 řádků pro napsání quicksortu v imperativních jazycích, implementace v Haskellu je mnohem kratší a elegantnější. Quicksort se stal haskellovou vábničkou. Tudíž si ho tady napíšeme, přestože je psaní quicksortu v Haskellu považováno za celkem podřadné, protože to všichni používají jako ukázku elegance Haskellu.
 </p>
-<img src="quickman.png" alt="rychlonožka" class="left" width="180" height="235">
+<img src="images/quickman.png" alt="rychlonožka" class="left" width="180" height="235">
 <p>
 Takže typové omezení této funkce bude <span class="fixed">quicksort :: (Ord a) =&gt; [a] -&gt; [a]</span>. Žádné překvapení. Okrajová podmínka? Prázdný seznam, což jsme čekali. Seřazený prázdný seznam je prázdný seznam. A teď přichází základní algoritmus: <em>seřazený seznam je seznam, který má všechny hodnoty, jež jsou menší (nebo rovny) prvnímu prvku seznamu, na svém začátku (a tyto hodnoty jsou seřazeny), poté obsahuje první prvek a dále následují všechny hodnoty, které jsou větší než první prvek (jsou také seřazeny).</em> Všimněte si, že jsme v této definici dvakrát zmínili slovo <i>seřazeny</i>, takže pravděpodobně budeme muset udělat rekurzivní volání dvakrát! Také si povšiměte, že jsme to definovali použitím slovesa <i>je</i> pro definici algoritmu, místo abychom řekli <i>udělej tohle, udělej tamto, pak udělej to&hellip;</i> V tom spočívá krása funkcionálního programování! Jak zařídíme filtrování seznamu, abychom dostali pouze menší nebo větší prvky než je první prvek z našeho seznamu? Pomocí generátoru seznamu. Takže se do toho pustíme a definujeme si tu funkci.
 </p>
@@ -151,7 +151,7 @@ ghci&gt; quicksort "prilis zlutoucky kun upel dabelske ody"
 <p>
 Hurá! Přesně o tomhle jsem mluvil! Takže když máme, řekněme, <span class="fixed">[5,1,9,4,6,7,3]</span> a chceme tento seznam seřadit, algoritmus vezme první prvek, což je <span class="fixed">5</span> a poté ho vloží doprostřed dvou seznamů, které jsou menší a větší než ten prvek. Takže v jednom okamžiku máme <span class="fixed">[1,4,3] ++ [5] ++ [9,6,7]</span>. Víme, že až bude ten seznam celý seřazen, číslo <span class="fixed">5</span> zůstane na čtvrtém místě, protože jsou v seznamu tři čísla menší a tři větší. A teď, jakmile seřadíme <span class="fixed">[1,4,3]</span> a <span class="fixed">[9,6,7]</span>, dostaneme seřazený seznam! Seřadíme ty dva seznamy použitím stejné funkce. Nakonec se to celé rozpadne tak, že dospějeme k prázdným seznamům a prázdné seznamy jsou už svým způsobem seřazené, vzhledem k tomu, že jsou prázdné. Tady je znázornění:
 </p>
-<img src="quicksort.png" alt="quicksort" class="center" width="799" height="332">
+<img src="images/quicksort.png" alt="quicksort" class="center" width="799" height="332">
 <p>
 Prvek, který je na svém místě a nebudeme ho posouvat, je znázorněn <span style="color:#FF6600; font-weight:bold;">oranžově</span>. Jestliže je přečtete z leva do prava, uvidíte seřazený seznam. Ačkoliv jsme si vybrali na porovnávání první prvek, mohli jsme si vybrat jakýkoliv jiný. V quicksortu se prvek, který se používá na porovnávání, nazývá pivot. Je vyznačený <span style="color:#009900; font-weight:bold">zeleně</span>. Vybrali jsme si první prvek, protože se jednoduše dá získat pomocí vzoru. Menší prvky než je pivot jsou zvýrazněny <span style="color:#0f0; font-weight:bold">světle zeleně</span> a větší prvky než je pivot jsou <span style="color:#030; font-weight:bold">tmavě zelené</span>. Nažloutlý přechod symbolizuje aplikaci quicksortu.
 </p>
@@ -159,7 +159,7 @@ Prvek, který je na svém místě a nebudeme ho posouvat, je znázorněn <span s
 <p>
 Udělali jsme toho dosud pomocí rekurze celkem dost a jak jste si zřejmě všimli, je v tom určité schéma. Obvykle si definujeme okrajový případ a poté funkci, která dělá něco s nějakým prvkem a funkcí aplikovanou na zbytek. Nezáleží na tom, jestli to je seznam, strom nebo nějaká jiná datová struktura. Součet je první prvek seznamu plus součet zbytku. Násobek seznamu je první prvek seznamu krát násobek zbytku. Délka seznamu je jednička plus délka zbytku seznamu. A tak dále, a tak dále&hellip;
 <p>
-<img src="brain.png" alt="mozek" class="left" width="250" height="219">
+<img src="images/brain.png" alt="mozek" class="left" width="250" height="219">
 <p>
 Samozřejmě, tyhle funkce mají rovněž okrajové případy. Okrajový případ je obvykle nějaká možnost, u které aplikace rekurze nedává smysl. Když se pracujeme se seznamy, okrajovým případem často bývá prázdný seznam. Jestliže pracujeme se stromy, okrajovým případem obvykle je uzel, jež nemá žádné potomky.
 </p>
