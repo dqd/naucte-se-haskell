@@ -2,7 +2,7 @@
 <h1 style="margin-left:-3px"><?=$contents['zaciname']['title']?></h1>
 <a name="pripravit-pozor-ted"></a><h2>Připravit, pozor, teď!</h2>
 <p>
-<img src="startingout.png" class="right" alt="vejce" width="214" height="187">
+<img src="images/startingout.png" class="right" alt="vejce" width="214" height="187">
 Fajn, tak začneme! Pokud patříte do skupiny těch hrozných osob, které nečtou úvody do čehokoliv, a přeskočili ho, možná byste si stejně měli přečíst poslední část úvodu, protože se tam vysvětluje, co je potřeba na práci s tímto tutoriálem a jak budeme načítat soubory s funkcemi. První věc, kterou se budeme zabývat, je spuštění interaktivního módu GHC a zavolání nějakých funkcí, abyste se spřátelili s Haskellem. Spusťte si terminál a zadejte do něj <span class="fixed">ghci</span>. Vypíše se zhruba takovéto uvítání:
 </p>
 <pre name="code" class="haskell: ghci">
@@ -84,7 +84,7 @@ Jejda! GHCi se nám snaží sdělit, že <span class="fixed">"lama"</span> není
 Možná to nevíte, ale teď jsme tu celou dobu používali funkce. Například <span class="fixed">*</span> je funkce, která bere dvě čísla a násobí je. Jak jste viděli, zavoláme ji vecpáním mezi ně. Tomu se říká <i>infixová</i> funkce. Většina funkcí, které nepracují s čísly, jsou <i>prefixové</i> funkce. Podívejme se na ně.
 </p>
 <p>
-<img src="ringring.png" alt="telefon" class="right" width="160" height="161">
+<img src="images/ringring.png" alt="telefon" class="right" width="160" height="161">
 Funkce jsou většinou prefixové, takže i když od teď explicitně neuvedeme, že je to funkce v prefixové formě, budeme ji za ni považovat. Ve většině imperativních jazyků jsou funkce zavolány napsáním názvu funkce a poté parametrů v závorkách, často oddělených čárkami. V Haskellu jsou funkce zavolány napsáním názvu funkce, mezery, a poté parametrů, oddělených mezerami. Pro začátek zkusíme zavolat jednu z nejnudnějších funkcí v Haskellu.
 </p>
 <pre name="code" class="haskell: ghci">
@@ -169,7 +169,7 @@ A teď vytvoříme funkci, která násobí číslo dvojkou, pokud to číslo je 
 doubleSmallNumber x = if x &gt; 100
                         then x
                         else x*2 </pre>
-<img src="baby.png" alt="to jste vy" class="left" width="140" height="211">
+<img src="images/baby.png" alt="to jste vy" class="left" width="140" height="211">
 <p>
 Tady jsme ukázali haskellový výraz if. Pravděpodobně znáte if z jiných jazyků. Rozdíl mezi tím v Haskellu a tím v imperativních jazycích je v tom, že část s else je v Haskellu povinná. V imperativních jazycích můžete přeskočit několik kroků, pokud není podmínka splněna, ale v Haskellu musí každý výraz a funkce něco vracet. Mohli bychom mít napsaný podmíněný výraz na jednom řádku, ale já pokládám první způsob za více přehledný. Další věc ohledně if v Haskellu: jedná se o <i>výraz</i>. Výraz je v podstatě kus kódu, který vrací hodnotu. Například <span class="fixed">5</span> je výraz, protože vrací 5, <span class="fixed">4 + 8</span> je výraz, <span class="fixed">x + y</span> je také výraz, protože vrací součet <span class="fixed">x</span> a <span class="fixed">y</span>. Jelikož je else povinné, výraz if vždycky něco vrátí a proto je také výraz. Pokud chceme přidat jedničku ke každému číslu, které je vráceno naší předchozí funkcí, mohli bychom ji napsat zhruba takto.
 </p>
@@ -186,7 +186,7 @@ Jsou tu dvě pozoruhodné věci. První je, že v názvu funkce jsme Conanovo jm
 </p>
 <a name="uvod-do-seznamu"></a><h2>Úvod do seznamů</h2>
 <p>
-<img src="list.png" alt="KUP SI PSA" class="left" width="150" height="103">
+<img src="images/list.png" alt="KUP SI PSA" class="left" width="150" height="103">
 Stejně jako nákupní seznamy v reálném světě, seznamy v Haskellu jsou velmi užitečné. Je to nejvíce používaná datová struktura a může být použita na mnoho různých způsobů pro modelování a řešení spoustu problémů. Seznamy jsou TAK skvělé. V téhto sekci se podíváme na základy práce se seznamy, řetězce (které jsou také seznamy) a na generátor seznamu.
 </p>
 <p>
@@ -297,7 +297,7 @@ ghci&gt; last [5,4,3,2,1]
 ghci&gt; init [5,4,3,2,1]
 [5,4,3,2]</pre>
 <p>Pokud budeme seznam považovat za příšeru, bude to asi takovéhle.</p>
-<img src="listmonster.png" alt="seznamová příšera" class="center" width="580" height="290">
+<img src="images/listmonster.png" alt="seznamová příšera" class="center" width="580" height="290">
 <p>Ale co se stane, když budeme chtít první prvek z prázdného seznamu?</p>
 <pre name="code" class="haskell: ghci">
 ghci&gt; head []
@@ -368,7 +368,7 @@ Tohle bylo pár základních funkcí na práci se seznamy. Na více funkcí se p
 </p>
 <a name="serifovy-rozsahy"></a><h2>Šerifovy rozsahy</h2>
 <p>
-<img src="cowboy.png" alt="kovboj" class="right" width="200" height="258">
+<img src="images/cowboy.png" alt="kovboj" class="right" width="200" height="258">
 Co když budeme chtít seznam všech čísel mezi jedničkou a dvacítkou? Určitě bychom je mohli všechny prostě napsat, ale to není zřejmě řešení pro džentlmeny, kteří požadují od svých programovacích jazyků dokonalost. Místo toho použijeme rozsahy. Rozsahy jsou způsob vytváření seznamů, které jsou aritmetické posloupnosti prvků, které se dají vyjmenovat. Čísla mohou být vyjmenována. Jedna, dva, tři, čtyři atd. Znaky mohou být také vyjmenovány. Abeceda je posloupnost znaků od A do Z (česká abeceda je od A do Ž). Jména nemůžou být vyjmenována. Co následuje po jménu „Jan“? Nevím.
 </p>
 <p>
@@ -425,8 +425,8 @@ Ačkoliv je jednodušší použít funkci <span class="label function">replicate
 </p>
 <a name="jsem-generator-seznamu"></a><h2>Jsem generátor seznamu</h2>
 <p>
-<img src="kermit.png" alt="žába" class="left" width="180" height="156">
-Pokud jste někdy absolvovali matematický kurz, možná jste už slyšeli o <i>intenzionálním zápisu množin</i>. Ten se běžně používá pro generování určitých množin. Jednoduchý zápis množiny, jež obsahuje prvních deset sudých přirozených čísel, je <img src="setnotation.png" alt="intenzionální zápis">. Část před svislítkem se nazývá výstupní funkce, <span class="fixed">x</span> je proměnná, <span class="fixed">N</span> je vstupní množina a <span class="fixed">x &lt;= 10</span> je predikát. To znamená, že množina obsahuje dvojnásobek všech přirozených čísel, které vyhovují predikátu.
+<img src="images/kermit.png" alt="žába" class="left" width="180" height="156">
+Pokud jste někdy absolvovali matematický kurz, možná jste už slyšeli o <i>intenzionálním zápisu množin</i>. Ten se běžně používá pro generování určitých množin. Jednoduchý zápis množiny, jež obsahuje prvních deset sudých přirozených čísel, je <img src="images/setnotation.png" alt="intenzionální zápis">. Část před svislítkem se nazývá výstupní funkce, <span class="fixed">x</span> je proměnná, <span class="fixed">N</span> je vstupní množina a <span class="fixed">x &lt;= 10</span> je predikát. To znamená, že množina obsahuje dvojnásobek všech přirozených čísel, které vyhovují predikátu.
 </p>
 <p>
 Pokud to budeme chtít vyjádřit v Haskellu, můžeme zkusit něco jako <span class="fixed">take 10 [2,4..]</span>. Ale co když nebudeme chtít dvojnásobky prvních deseti přirozených čísel, ale něco mnohem složitějšího? Mohli bychom ten seznam definovat intenzionálně, tedy ho vygenerovat. Generátor seznamu je velmi podobný intenzionálnímu zápisu množin. Budeme se zatím držet výpisu prvních deseti sudých čísel. Intenzionálně to můžeme zapsat jako <span class="fixed">[x*2 | x &lt;- [1..10]]</span>. Hodnota <span class="fixed">x</span> je brána z rozsahu <span class="fixed">[1..10]</span> a pro každý prvek z <span class="fixed">[1..10]</span> (jež je vázaný na <span class="fixed">x</span>) dostaneme naši hodnotu, akorát vynásobenou dvojkou. Tady je generátor seznamu v akci.
@@ -519,7 +519,7 @@ ghci&gt; [ [ x | x &lt;- xs, even x ] | xs &lt;- xxs]
 Generátor seznamu je možné zapsat přes několik řádků. Takže pokud zrovna nepracujete v GHCi, je lepší rozdělit dlouhé seznamy přes více řádků, zvláště když jsou zanořené.
 </p>
 <a name="n-tice"></a><h2>N-tice</h2>
-<img src="tuple.png" alt="n-tice" class="right" width="160" height="162">
+<img src="images/tuple.png" alt="n-tice" class="right" width="160" height="162">
 <p>
 V některých ohledech jsou n-tice (uspořádané heterogenní seznamy o n prvcích) podobné seznamům &mdash; slouží pro ukládání několika hodnot do jedné. Jenomže mají pár zásadních odlišností. Seznam čísel je seznam čísel. To je jeho typ a nezáleží na tom, jestli obsahuje jedno číslo nebo nekonečně mnoho. N-tice se ovšem používají, pokud přesně víte, kolik hodnot chcete zkombinovat a jejich typ závisí na počtu a typu jednotlivých složek. Jsou uvozeny kulatými závorkami a jejich složky odděleny čárkami.
 </p>

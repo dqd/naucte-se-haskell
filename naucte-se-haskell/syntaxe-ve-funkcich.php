@@ -1,7 +1,7 @@
 <div class="english-version"><a href="http://learnyouahaskell.com/syntax-in-functions">English version</a></div>
 <h1 style="margin-left:-3px">Syntaxe ve funkcích</h1>
 <a name="vzory"></a><h2>Vzory</h2>
-<img src="pattern.png" alt="čtyři!" class="right" width="162" height="250">
+<img src="images/pattern.png" alt="čtyři!" class="right" width="162" height="250">
 <p>
 Tato kapitola se bude týkat některých užitečných syntaktických konstruktů a nejprve se pustíme do vzorů (pattern matching). Vzory se sestávají z určitých schémat, kterým mohou data odpovídat a poté se ověřuje, jestli ano, a podle těchto schémat se data dekonstruují.
 </p>
@@ -184,7 +184,7 @@ Normálně používáme zástupné vzory, abychom se vyhnuli opakování při ov
 Ještě jedna věc &mdash; nemůžete ve vzorech použít operátor <span class="fixed">++</span>. Pokud se budete snažit ověřit výraz pomocí vzoru <span class="fixed">(xs ++ ys)</span>, jaký bude první a jaký druhý seznam? Nedává to příliš smysl. Mohlo by dávat smysl, kdybychom chtěli udělat něco jako <span class="fixed">(xs ++ [x,y,z])</span> nebo jenom <span class="fixed">(xs ++ [x])</span>, ale není to možné, už ze samotné podstaty seznamů.
 </p>
 <a name="straze-straze"></a><h2>Stráže, stráže!</h2>
-<img src="guards.png" alt="stráž" class="left" width="83" height="180">
+<img src="images/guards.png" alt="stráž" class="left" width="83" height="180">
 <p>
 Zatímco vzory jsou určeny k ujištění, že hodnota vyhovuje určité formě, a k její dekonstrukci, stráže jsou pro testování, jestli je nějaká vlastnost hodnoty (či více hodnot) pravdivá nebo nepravdivá. To zní skoro jako výraz if a opravdu je to velice podobné. Věc se má tak, že stráže jsou mnohem čitelnější, když je těch podmínek více, a chovají se spíše jako vzory.
 </p>
@@ -353,7 +353,7 @@ cylinder r h =
         topArea  = pi * r^2
     in  sideArea + 2 * topArea
 </pre>
-<img src="letitbe.png" alt="let it be" class="right" width="215" height="240">
+<img src="images/letitbe.png" alt="let it be" class="right" width="215" height="240">
 <p>
 Podoba zápisu je <span class="fixed">let &lt;definice&gt; in &lt;výraz&gt;</span>. Názvy, které definujete v části s let jsou přístupné výrazu v části za in. Jak můžete vidět, dalo by se to také zapsat pomocí konstrukce where. Všimněte si, že názvy jsou také zarovnány do jednoho sloupce. Takže jaký je rozdíl mezi těmito dvěma zápisy? Zatím to vypadá, že se u let píše definice jako první a používaný výraz až později, zatímco u where to je naopak.
 </p>
@@ -427,7 +427,7 @@ ghci&gt; boot
 Když je konstrukce let tak skvělá, proč bychom ji nemohli použít všude namísto where, ptáte se? No, protože je konstrukce let výraz a je poctivě lokální ve své působnosti, nemůže být použita mezi strážemi. Někteří lidé mají raději konstrukci where, protože definice následují za funkcí, ve které se používají. V tomto zápisu je tělo funkce blíže názvu funkce a typové deklaraci, takže to je pro některé čitelnější.
 </p>
 <a name="podmineny-vyraz-case"></a><h2>Podmíněný výraz case</h2>
-<img src="case.png" alt="kufr" class="right" width="185" height="164">
+<img src="images/case.png" alt="kufr" class="right" width="185" height="164">
 <p>
 Mnoho imperativních jazyků (C, C++, Java apod.) mají case syntaxi a pokud jste v nějakém z nich programovali, pravděpodobně víte, co to je. Funguje to tak, že se vezme proměnná a potom se provedou bloky kódu pro určenou hodnotu té proměnné a je možnost na konec přidat blok, který zachytí cokoliv, pro případ, že by proměnná nabyla hodnoty, se kterou jsme nepočítali.
 </p>

@@ -1,7 +1,7 @@
 <div class="english-version"><a href="http://learnyouahaskell.com/modules">English version</a></div>
 <h1><?=$contents['moduly']['title']?></h1>
 <a name="nacitani-modulu"></a><h2><?=$contents['moduly']['subchapters']['nacitani-modulu']?></h2>
-<img src="modules.png" alt="moduly" class="right" width="230" height="162">
+<img src="images/modules.png" alt="moduly" class="right" width="230" height="162">
 <p>
 Modul je v Haskellu kolekce souvisejících funkcí, typů a typových tříd. Program je v Haskellu kolekce modulů, kde hlavní modul načte ostatní moduly a poté použije funkce, které jsou v nich definované a něco pomocí nic udělá. Rozdělení kódu do několika modulů má celkem dost výhod. Jestliže je modul dostatečně obecný, funkce v něm mohou být použity ve velkém množství odlišných programů. Pokud je váš kód oddělený do samostatných modulů, které na sobě příliš nezávisí (říkáme jim také volně vázané), můžeme je později použít znovu. To dělá celou záležitost psaní kódu zvládnutelnější, když je kód rozdělený do více částí a každá část má svůj účel.
 </p>
@@ -108,7 +108,7 @@ ghci&gt; map sum $ transpose [[0,3,5,9],[10,0,0,9],[8,5,1,-1]]
 <p>
 Když prohazujeme tyhle tři seznamy, třetí mocniny jsou pak v prvním řádku, druhé ve druhém a tak dále. Namapováním funkce <span class="fixed">sum</span> na tento transponovaný seznam seznamů dosáhneme požadovaného výsledku.
 </p>
-<img src="legolists.png" alt="nákupní seznamy" class="left" width="230" height="212">
+<img src="images/legolists.png" alt="nákupní seznamy" class="left" width="230" height="212">
 <p>
 Funkce <span class="label function">foldl'</span>, <span class="label function">foldl1'</span>, <span class="label function">foldr'</span> a <span class="label function">foldr1'</span> jsou striktní verze svých příslušných líných podob. Když použijeme líný fold na opravdu velký seznam, může nastat chyba přetečení zásobníku. Viník této chyby je líná podstata foldů, protože hodnota akumulátoru se ve skutečnosti při skládání neaktualizuje. Co se děje ve skutečnosti je to, že akumulátor tak nějak slibuje, že spočítá svou hodnotu, jakmile se to po něm bude chtít. Takhle je to u každého akumulátoru s mezivýsledkem a všechny tyhle nahromaděné sliby přetečou váš zásobník. Striktní foldy nejsou líní lemplové a ve skutečnosti vypočítají mezivýsledky hned jak k nim přicházejí místo aby plnily zásobník sliby. Takže jestliže někdy dostanete chybu přetečení zásobníku při skládání seznamů, zkuste přejít na striktní verzi foldů.
 </p>
@@ -518,7 +518,7 @@ ghci&gt; sortBy (compare `on` length) xs
 Paráda! Část <span class="fixed">compare `on` length</span> je v podstatě normální angličtina! Jestli si nejste jistí, k čemu tady funkce <span class="fixed">on</span> je, tak výraz <span class="fixed">compare `on` length</span> funguje stejně jako <span class="fixed">\x y -&gt; length x `compare` length y</span>. Když se zabýváte funkcemi s <i>By</i> využívajícími porovnávací funkce, obvykle napíšete <span class="fixed">(==) `on` něco</span>, a když se zabýváte funkcemi s <i>By</i> využívajícími porovnávací funkce, obvykle napíšete <span class="fixed">compare `on` něco</span>.
 </p>
 <a name="data-char"></a><h2><?=$contents['moduly']['subchapters']['data-char']?></h2>
-<img src="legochar.png" alt="lego znak" class="right" width="230" height="323">
+<img src="images/legochar.png" alt="lego znak" class="right" width="230" height="323">
 <p>
 Modul <span class="fixed">Data.Char</span> dělá přesně to, co jeho název napovídá. Exportuje funkce zabývajícími se znaky. Také je užitečný při filtrování a mapování řetězců, protože to jsou vlastně jenom seznamy znaků.
 </p>
@@ -768,7 +768,7 @@ Just "555-2938"
 ghci&gt; findKey "wilma" phoneBook
 Nothing
 </pre>
-<img src="legomap.png" alt="lego mapa" class="left" width="214" height="240">
+<img src="images/legomap.png" alt="lego mapa" class="left" width="214" height="240">
 <p>
 Funguje to jedna radost! Jestliže máme v našem seznamu telefonní číslo holky, vybereme právě to číslo, jinak nic nevrátíme.
 </p>
@@ -963,7 +963,7 @@ fromList [(3,104),(5,103),(6,339)]
 Tohle je pouze několik funkcí z modulu <span class="fixed">Data.Map</span>. V <a href="http://www.haskell.org/ghc/docs/latest/html/libraries/containers/Data-Map.html">dokumentaci</a> můžete nalézt jejich kompletní seznam.
 </p>
 <a name="data-set"></a><h2><?=$contents['moduly']['subchapters']['data-set']?></h2>
-<img src="legosets.png" alt="lego set" class="right" width="150" height="236">
+<img src="images/legosets.png" alt="lego set" class="right" width="150" height="236">
 <p>
 Modul <span class="fixed">Data.Set</span> nám poskytuje množiny podobající se těm matematickým. Množiny jsou něco mezi seznamy a mapami. Všechny prvky v množině jsou unikátní. A protože jsou interně implementovány pomocí stromů (podobně jako mapy z modulu <span class="fixed">Data.Map</span>), jsou taktéž seřazeny. Zjišťování příslušnosti, vkládání, mazání atd. je mnohem rychlejší než provádění stejných akcí se seznamy. Nejobvyklejšími operacemi na množinách jsou vkládání do množiny, zjišťování příslušnosti a převádění množiny na seznam.
 </p>
@@ -1075,7 +1075,7 @@ ghci&gt; nub "JAK TI DUPOU KRÁLÍCI?"
 Naše funkce <span class="fixed">setNub</span> je na větších seznamech obecně rychlejší než funkce <span class="fixed">nub</span>, ale jak můžete vidět, tak funkce <span class="fixed">nub</span> zachovává pořadí prvků v seznamu, zatímce funkce <span class="fixed">setNub</span> ne.
 </p>
 <a name="vytvareni-vlastnich-modulu"></a><h2><?=$contents['moduly']['subchapters']['vytvareni-vlastnich-modulu']?></h2>
-<img src="making_modules.png" alt="vytváření modulů" class="right" width="345" height="224">
+<img src="images/making_modules.png" alt="vytváření modulů" class="right" width="345" height="224">
 <p>
 Zkoumali jsme zatím pár skvělých modulů, ale jak si vytvoříme vlastní? Téměř každý programovací jazyk nám umožňuje rozdělit náš kód do více souborů a v Haskellu tomu není jinak. Při psaní programů je dobrým zvykem vzít všechny funkce a data, jež slouží k podobnému účelu, a vložit do modulu. Takto můžete jednoduše opětovně použít tyto funkce v jiných programech pouhým importováním daného modulu.
 </p>

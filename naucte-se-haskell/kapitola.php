@@ -25,7 +25,7 @@
 <body class="introcontent">
 <div class="bgwrapper">
     <div id="content">
-    <img src="beta.png" style="position:absolute;top:10px;right:15px" alt="beta">
+    <img src="images/beta.png" style="position:absolute;top:10px;right:15px" alt="beta">
     <? if ($previous || $next): ?>
             <div class="footdiv" style="margin-bottom:25px;">
                 <ul>

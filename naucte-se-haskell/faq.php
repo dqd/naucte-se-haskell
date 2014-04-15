@@ -1,5 +1,5 @@
 <h1 title="Často kladené dotazy">FAQ</h1>
-<img src="turtle.png" alt="Želva???" class="right" width="349" height="204">
+<img src="images/turtle.png" alt="Želva???" class="right" width="349" height="204">
 <h2>Hej, co to je za skvělý nápad? Není to jenom Whyova příručka, akorát pro Haskell?</h2>
 <p>Ano je to tak, nestydatě jsem to celé zkopíroval slovo od slova. Haha, teď vážně, je to tak? Je to opravdu tak? Je to také lehkovážná odborná příručka k programovacímu jazyku, plná hezkých obrázků, ale není tak potrhlá, bláznivá ani zábavná jako je <a href="http://mislav.uniqpath.com/poignant-guide/">Whyova příručka jazyka Ruby</a>. Hodně lidí je zastrašených Haskellem, protože vypadá, že je plný matematiky a velkých tvrzení, takže byly přidány roztomilé obrázky z důvodů uklidnění čtenářů.</p>
 <h2>Namaloval jsi ty obrázky sám?</h2>
