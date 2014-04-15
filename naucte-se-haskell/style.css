@@ -67,7 +67,7 @@ pre.code {
     padding:10px;
     background-color:#ffc;
     margin-bottom:25px;
-    background-image:url(note.jpg);
+    background-image: url(images/note.jpg);
 }
 .label {
     white-space:nowrap;
@@ -102,7 +102,7 @@ pre.code {
     margin:0px auto;
 }
 .introcontent {
-    background-image:url(bg.png);
+    background-image: url(images/bg.png);
 }
 .bgwrapper {
     margin-top:50px;
@@ -171,13 +171,13 @@ pre.code {
 }
 .prevlink {
     padding-left:20px;
-    background-image:url(prv.png);
+    background-image: url(images/prv.png);
     background-position:0px 3px;
     background-repeat:no-repeat;
 }
 .nxtlink {
     padding-right:20px;
-    background-image:url(nxt.png);
+    background-image: url(images/nxt.png);
     background-position:top right;
     background-repeat:no-repeat;
 }
@@ -214,7 +214,7 @@ p.exercise {
     width: 900px;
     height: 651px;
     text-indent: -9999px;
-    background-image: url(splash.png);
+    background-image: url(images/splash.png);
     background-repeat: no-repeat;
     margin: 0 auto;
 }

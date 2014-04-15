@@ -170,7 +170,7 @@
 </style>
 <meta name="language" content="cs">
 <meta name="robots" content="index,follow">
-<link rel="shortcut icon" href="favicon.png" type="image/png">
+<link rel="shortcut icon" href="images/favicon.png" type="image/png">
 <link rel="alternate" href="rss.php" type="application/rss+xml" title="Naučte se Haskell!">
 </head>
 <body>
