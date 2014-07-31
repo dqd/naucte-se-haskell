@@ -230,7 +230,8 @@ ghci&gt; bmiTell 85 1.90
 Jéje! Nejsem tlustý! Ale Haskell mě nazval šeredným. Co už!
 </p>
 <p>
-Všimněte si, že se nepoužívá rovnítko <span class="fixed">=</span> za názvem funkce a jejími parametry, před první stráží. Hodně začátečníkům to vypíše chybu v syntaxi, protože ho tam občas vloží.
+<div class="hintbox"><em>Poznámka:</em> všimněte si, že se nepoužívá rovnítko <span class="fixed">=</span> za názvem funkce a jejími parametry, před první stráží. Hodně začátečníkům to vypíše chybu v syntaxi, protože ho tam občas vloží.</div>
+
 </p>
 <p>
 Další velmi jednoduchý příklad: napišme si vlastní funkci <span class="fixed">max</span>. Určitě si pamatujete, že vezme dvě porovnatelné věci a vrátí větší z nich.
@@ -265,7 +266,7 @@ GT
 <div class="hintbox"><em>Poznámka:</em> funkci můžeme kromě infixového zavolání pomocí zpětných apostrofů také infixově definovat. Někdy je tenhle způsob čitelnější.</div>
 <a name="lokalni-definice-where"></a><h2>Lokální definice pomocí where</h2>
 <p>
-V předchozí sekci jsme si definovali funkci na počítání hmotnosti a nadávání. Bylo to nějak takhle:
+V předchozí sekci jsme si definovali funkci na počítání BMI  a nadávání. Bylo to nějak takhle:
 </p>
 <pre name="code" class="haskell:hs">
 bmiTell :: (RealFloat a) =&gt; a -&gt; a -&gt; String
@@ -306,7 +307,7 @@ bmiTell weight height
 Názvy, jež definujeme u funkce v části s where, jsou dostupné pouze v té funkci, takže se nemusíme obávat o zaneřádění jmenných prostorů jiných funkcí. Všimněte si, ze jsou všechny názvy zarovnány do jednoho sloupce. Pokud je pořádně nezarovnáme, Haskell bude zmatený, protože nebude vědět, co je součástí stejného bloku.
 </p>
 <p>
-Konstrukce where není sdílená v tělu funkce mezi různými vzory. Pokud chcete přistupovat u více vzorů v jedné funkci k nějakým definicím, musíte je definovat globálně.
+Konstrukce <i>where</i> není sdílená v tělu funkce mezi různými vzory. Pokud chcete přistupovat u více vzorů v jedné funkci k nějakým definicím, musíte je definovat globálně.
 </p>
 <p>
 Je také možné ve where definicích použít <em>vzory</em>! Můžeme přepsat sekci s where v naší předchozí funkci na:
@@ -340,7 +341,7 @@ calcBmis xs = [bmi w h | (w, h) &lt;- xs]
 A to je všecho, co je potřeba! Důvod, proč jsme v tomto příkladu zavedli <span class="fixed">bmi</span> jako funkci, je protože nemůžeme vypočítat jedno BMI z parametrů funkce. Musíme projít celý seznam předaný funkci a každá dvojice ze seznamu má rozdílné BMI.
 </p>
 <p>
-Konstrukce where se mohou také větvit. Je to běžný postup, vytvořit funkci a definovat k ní nějaké pomocné funkce se svými where klauzulemi, a pak těm funkcím vytvořit další pomocné funkce, každou s vlastními where klauzulemi.
+Konstrukce <i>where</i> se mohou také větvit. Je to běžný postup, vytvořit funkci a definovat k ní nějaké pomocné funkce se svými where klauzulemi, a pak těm funkcím vytvořit další pomocné funkce, každou s vlastními <i>where</i> klauzulemi.
 </p>
 <a name="lokalni-definice-let"></a><h2>&hellip; a pomocí let</h2>
 <p>
@@ -388,21 +389,21 @@ ghci&gt; (let a = 100; b = 200; c = 300 in a*b*c, let foo="Hej "; bar = "ty!" in
 (6000000,"Hej ty!")
 </pre>
 <p>
-Nemusíte vkládat středník za poslední definici, ale můžete, pokud chcete. Jak jsme již řekli, v konstrukcích let je možnost použít vzory. Je to velice užitečné pro rychlé rozebrání n-tic na složky a navázání na názvy a tak.
+Nemusíte vkládat středník za poslední definici, ale můžete, pokud chcete. Jak jsme již řekli, v konstrukcích <i>let</i> je možnost použít vzory. Je to velice užitečné pro rychlé rozebrání n-tic na složky a navázání na názvy a tak.
 </p>
 <pre name="code" class="haskell:ghci">
 ghci&gt; (let (a,b,c) = (1,2,3) in a+b+c) * 100
 600
 </pre>
 <p>
-Můžete také vložit konstrukci let dovnitř generátoru seznamu. Přepišme si náš předchozí příklad na počítání seznamů dvojic vah a výšek a použijme v něm let v generátoru seznamu místo abychom definovali pomocnou funkci přes where.
+Můžete také vložit konstrukci <i>let</i> dovnitř generátoru seznamu. Přepišme si náš předchozí příklad na počítání seznamů dvojic vah a výšek a použijme v něm <i>let</i> v generátoru seznamu místo abychom definovali pomocnou funkci přes <i>where</i>.
 </p>
 <pre name="code" class="haskell:hs">
 calcBmis :: (RealFloat a) =&gt; [(a, a)] -&gt; [a]
 calcBmis xs = [bmi | (w, h) &lt;- xs, let bmi = w / h ^ 2]
 </pre>
 <p>
-Zařadili jsme let do generátoru seznamu, jako by byl predikát, jenom nefiltruje seznam, ale definuje názvy. Názvy, definované pomocí let v generátoru seznamu jsou viditelné výstupní funkci (část před svislítkem <span class="fixed">|</span>) a všem predikátům a případným částem, které následují po definicích. Takže bychom mohli funkci předělat, aby vracela pouze BMI tlustých lidí:
+Zařadili jsme <i>let</i> do generátoru seznamu, jako by byl predikát, jenom nefiltruje seznam, ale definuje názvy. Názvy, definované pomocí <i>let</i> v generátoru seznamu jsou viditelné výstupní funkci (část před svislítkem <span class="fixed">|</span>) a všem predikátům a případným částem, které následují po definicích. Takže bychom mohli funkci předělat, aby vracela pouze BMI tlustých lidí:
 </p>
 <pre name="code" class="haskell:hs">
 calcBmis :: (RealFloat a) =&gt; [(a, a)] -&gt; [a]
@@ -412,7 +413,7 @@ calcBmis xs = [bmi | (w, h) &lt;- xs, let bmi = w / h ^ 2, bmi &gt;= 25.0]
 Nemůžeme použít název <span class="fixed">bmi</span> v části s <span class="fixed">(w, h) &lt;- xs</span>, protože je definovaná před konstrukcí let.
 </p>
 <p>
-Vynechali jsme část s in konstrukce let, když jsme pracovali s generátorem seznamu, protože tam je viditelnost názvů předdefinována. Nicméně jsme mohli použít konstrukci let-in v predikátu a názvy mohli definovat tak, aby byly viditelné pouze predikátu. Část s in může být také vynechána, když definujeme funkce a konstanty přímo v GHCi. Pokud to uděláme, názvy pak budou viditelné po celý čas interaktivní relace.
+Vynechali jsme část s <i>in</i> konstrukce <i>let</i>, když jsme pracovali s generátorem seznamu, protože tam je viditelnost názvů předdefinována. Nicméně jsme mohli použít konstrukci <i>let-in</i> v predikátu a názvy mohli definovat tak, aby byly viditelné pouze predikátu. Část s <i>in</i> může být také vynechána, když definujeme funkce a konstanty přímo v GHCi. Pokud to uděláme, názvy pak budou viditelné po celý čas interaktivní relace.
 </p>
 <pre name="code" class="haskell:ghci">
 ghci&gt; let zoot x y z = x * y + z
@@ -424,7 +425,7 @@ ghci&gt; boot
 &lt;interactive&gt;:1:0: Not in scope: `boot'
 </pre>
 <p>
-Když je konstrukce let tak skvělá, proč bychom ji nemohli použít všude namísto where, ptáte se? No, protože je konstrukce let výraz a je poctivě lokální ve své působnosti, nemůže být použita mezi strážemi. Někteří lidé mají raději konstrukci where, protože definice následují za funkcí, ve které se používají. V tomto zápisu je tělo funkce blíže názvu funkce a typové deklaraci, takže to je pro některé čitelnější.
+Když je konstrukce <i>let</i> tak skvělá, proč bychom ji nemohli použít všude namísto <i>where</i>, ptáte se? No, protože je konstrukce <i>let</i> výraz a je poctivě lokální ve své působnosti, nemůže být použita mezi strážemi. Někteří lidé mají raději konstrukci <i>where</i>, protože definice následují za funkcí, ve které se používají. V tomto zápisu je tělo funkce blíže názvu funkce a typové deklaraci, takže to je pro některé čitelnější.
 </p>
 <a name="podmineny-vyraz-case"></a><h2>Podmíněný výraz case</h2>
 <img src="images/case.png" alt="kufr" class="right" width="185" height="164">
@@ -432,7 +433,7 @@ Když je konstrukce let tak skvělá, proč bychom ji nemohli použít všude na
 Mnoho imperativních jazyků (C, C++, Java apod.) mají case syntaxi a pokud jste v nějakém z nich programovali, pravděpodobně víte, co to je. Funguje to tak, že se vezme proměnná a potom se provedou bloky kódu pro určenou hodnotu té proměnné a je možnost na konec přidat blok, který zachytí cokoliv, pro případ, že by proměnná nabyla hodnoty, se kterou jsme nepočítali.
 </p>
 <p>
-Haskell bere tento koncept a rozšiřuje ho. Jak název napovídá, výrazy case jsou, no, výrazy, podobně jako výraz if a konstrukce let. Nejenom že umí vyhodnocovat výrazy podle možných případů, ve kterých proměnná nabývá určitých hodnot, můžeme také vyhodnocovat na základě vzorů. Hmmm, vzít proměnnou, ověřit podle vzoru, vyhodnotit kus kódu na podle jeho hodnoty, kde jsme to už slyšeli? No jasně, ověřování vzorů podle parametrů v definici funkce! Takže to je ve skutečnosti pouhý syntaktický cukr pro case výraz. Tyhle dva kusy kódy dělají tu stejnou věc a jsou zaměnitelné:
+Haskell bere tento koncept a rozšiřuje ho. Jak název napovídá, výrazy case jsou, no, výrazy, podobně jako výraz if a konstrukce <i>let</i>. Nejenom že umí vyhodnocovat výrazy podle možných případů, ve kterých proměnná nabývá určitých hodnot, můžeme také vyhodnocovat na základě vzorů. Hmmm, vzít proměnnou, ověřit podle vzoru, vyhodnotit kus kódu na podle jeho hodnoty, kde jsme to už slyšeli? No jasně, ověřování vzorů podle parametrů v definici funkce! Takže to je ve skutečnosti pouhý syntaktický cukr pro case výraz. Tyhle dva kusy kódy dělají tu stejnou věc a jsou zaměnitelné:
 </p>
 <pre name="code" class="haskell:hs">
 head' :: [a] -&gt; a
