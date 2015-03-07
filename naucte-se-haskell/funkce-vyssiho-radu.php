@@ -327,7 +327,7 @@ Získání prvku s indexem <span class="fixed">4</span> z našeho seznamu vrát�
 <a name="lambdy"></a><h2>Lambdy</h2>
 <img src="images/lambda.png" alt="lambda" class="right" width="203" height="230">
 <p>
-Lambdy jsou v zásadě anonymní funkce, které jsou používané, protože často potřebujeme nějakou funkci jenom jednou. Obvykle si vytváříme lambdu, abychom ji předali funkci vyššího řádu. Pro vytvoření lambdy napíšeme znak <span class="fixed">\</span> (protože vypadá jako řecké písmeno lambda, když na něj pořádně zamžouráte) a poté napíšeme parametry, oddělené mezerami. Za tím následuje šipka <span class="fixed">-&gt;</span> a tělo funkce. Obvykle to celé obklopíme kulatými závorkami, protože jinak to má sahá dál napravo.
+Lambdy jsou v zásadě anonymní funkce, které jsou používané, protože často potřebujeme nějakou funkci jenom jednou. Obvykle si vytváříme lambdu, abychom ji předali funkci vyššího řádu. Pro vytvoření lambdy napíšeme znak <span class="fixed">\</span> (protože vypadá jako řecké písmeno lambda, když na něj pořádně zamžouráte) a poté napíšeme parametry, oddělené mezerami. Za tím následuje šipka <span class="fixed">-&gt;</span> a tělo funkce. Obvykle to celé obklopíme kulatými závorkami, protože jinak to sahá dál napravo.
 </p>
 <p>
 Jestliže se podíváte o pětadvacet centimetrů nahoru, uvidíte, že jsme v naší funkci <span class="fixed">numLongChains</span> použili konstrukci <i>where</i>, abychom si vytvořili funkci <span class="fixed">isLong</span>, kterou jsme předali funkci <span class="fixed">filter</span>. Takže místo toho můžeme použít lambdu:

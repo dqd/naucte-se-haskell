@@ -161,7 +161,7 @@ Udělali jsme toho dosud pomocí rekurze celkem dost a jak jste si zřejmě vši
 <p>
 <img src="images/brain.png" alt="mozek" class="left" width="250" height="219">
 <p>
-Samozřejmě, tyhle funkce mají rovněž okrajové případy. Okrajový případ je obvykle nějaká možnost, u které aplikace rekurze nedává smysl. Když se pracujeme se seznamy, okrajovým případem často bývá prázdný seznam. Jestliže pracujeme se stromy, okrajovým případem obvykle je uzel, jež nemá žádné potomky.
+Samozřejmě, tyhle funkce mají rovněž okrajové případy. Okrajový případ je obvykle nějaká možnost, u které aplikace rekurze nedává smysl. Když pracujeme se seznamy, okrajovým případem často bývá prázdný seznam. Jestliže pracujeme se stromy, okrajovým případem obvykle je uzel, jež nemá žádné potomky.
 </p>
 <p>
 Je to podobné, když rekurzivně pracujete s čísly. Obvykle to má co dělat s nějakým číslem a funkcí aplikovanou na to číslo s úpravou. Ukázali jsme si předtím funkci pro výpočet faktoriálu a to je násobek čísla a faktoriál toho čísla, zmenšeného o jedničku. Tahle aplikace rekurze nedává smysl pro nulu, protože faktoriál je definován pouze pro kladná celá čísla. Často se ukáže, že okrajový případ je identita. Identita pro násobení je jednička, protože jestliže vynásobíte něco jedničkou, dostanete to nazpět. Stejně tak když sčítáme seznamy, definujeme přičtení prázdného seznamu jako nulu, protože nula je identita ve sčítání. U quicksortu je okrajový případ prázdný seznam a identita je také prázdný seznam, protože jestliže připojíme prázdný seznam k seznamu, získame ten stejný seznam.

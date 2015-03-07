@@ -330,7 +330,7 @@ initials firstname lastname = [f] ++ ". " ++ [l] ++ "."
 Mohli bychom to ověřovat přímo v parametrech funkce (bylo by to ve skutečnosti kratší a zřejmější), ale tohle mělo jenom ukázat, že je možné to udělat taky pomocí where definic.
 </p>
 <p>
-Stejně jako jsem si definovali konstanty ve where blocích, můžete také definovat funkce. Abychom zůstali u našeho programovacího zdravotního tématu, vytvoříme se funkci, která vezme seznam dvojic vah a výšek a vrátí jejich index hmotnosti.
+Stejně jako jsem si definovali konstanty ve where blocích, můžete také definovat funkce. Abychom zůstali u našeho programovacího zdravotního tématu, vytvoříme si funkci, která vezme seznam dvojic vah a výšek a vrátí jejich index hmotnosti.
 </p>
 <pre name="code" class="haskell:hs">
 calcBmis :: (RealFloat a) =&gt; [(a, a)] -&gt; [a]

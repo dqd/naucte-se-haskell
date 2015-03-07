@@ -204,7 +204,7 @@ ghci&gt; sum $ takeWhile (&lt;10000) $ map (^3) [1..]
 Aplikujeme výraz <span class="fixed">(^3)</span> na nekonečný seznam a hned poté co narazíme na prvek, který je větší nebo rovný číslu 10000, seznam je oříznut. Pak tedy můžeme výsledek jednoduše sečíst.
 </p>
 <p>
-Funkce <span class="label function">dropWhile</span> je podobná, jenom zahazuje všechny prvky, dokud je predikát pravdivý. Jakmile se jednou predikát vyhodnotí jako <span class="fixed">False</span>, vrátí se zbytek seznamu. Extrémně užitečná a půvobná funkce!
+Funkce <span class="label function">dropWhile</span> je podobná, jenom zahazuje všechny prvky, dokud je predikát pravdivý. Jakmile se jednou predikát vyhodnotí jako <span class="fixed">False</span>, vrátí se zbytek seznamu. Extrémně užitečná a půvabná funkce!
 </p>
 <pre name="code" class="haskell:ghci">
 ghci&gt; dropWhile (/=' ') "Tohle je věta."
