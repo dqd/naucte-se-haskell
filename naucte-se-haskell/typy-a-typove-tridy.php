@@ -170,7 +170,7 @@ ghci&gt; :t (&gt;)
 (&gt;) :: (Ord a) =&gt; a -&gt; a -&gt; Bool
 </pre>
 <p>
-Všechny zatím probrané typy, kromě typů funkcí, jsou součástí třídy <span class="fixed">Ord</span>. Typová třída <span class="fixed">Ord</span> pokrývá standardní porovnávací funkce jako jsou <span class="fixed">&gt;</span>, <span class="fixed">&lt;</span>, <span class="fixed">&gt;=</span> a <span class="fixed">&lt;=</span>. Funkce <span class="fixed">compare</span> vezme dvě instance třídy <span class="fixed">Ord</span> stejného typu a vrátí jejich uspořádání. Pro uspořádání je určeny typ <span class="label type">Ordering</span>, který může nabývat hodnot <span class="fixed">GT</span>, <span class="fixed">LT</span> nebo <span class="fixed">EQ</span>, které znamenají (v tomto pořadí) <i>větší než</i>, <i>menší než</i> a <i>rovný</i>.
+Všechny zatím probrané typy, kromě typů funkcí, jsou součástí třídy <span class="fixed">Ord</span>. Typová třída <span class="fixed">Ord</span> pokrývá standardní porovnávací funkce jako jsou <span class="fixed">&gt;</span>, <span class="fixed">&lt;</span>, <span class="fixed">&gt;=</span> a <span class="fixed">&lt;=</span>. Funkce <span class="fixed">compare</span> vezme dvě instance třídy <span class="fixed">Ord</span> stejného typu a vrátí jejich uspořádání. Pro uspořádání je určený typ <span class="label type">Ordering</span>, který může nabývat hodnot <span class="fixed">GT</span>, <span class="fixed">LT</span> nebo <span class="fixed">EQ</span>, které znamenají (v tomto pořadí) <i>větší než</i>, <i>menší než</i> a <i>rovný</i>.
 </p>
 <p>
 Aby mohl být typ instancí <span class="fixed">Ord</span>, musí nejprve patřit do prestižní a exkluzivní třídy <span class="fixed">Eq</span>.

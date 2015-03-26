@@ -187,7 +187,7 @@ Jsou tu dvě pozoruhodné věci. První je, že v názvu funkce jsme Conanovo jm
 <a name="uvod-do-seznamu"></a><h2>Úvod do seznamů</h2>
 <p>
 <img src="images/list.png" alt="KUP SI PSA" class="left" width="150" height="103">
-Stejně jako nákupní seznamy v reálném světě, seznamy v Haskellu jsou velmi užitečné. Je to nejvíce používaná datová struktura a může být použita na mnoho různých způsobů pro modelování a řešení spoustu problémů. Seznamy jsou TAK skvělé. V téhto sekci se podíváme na základy práce se seznamy, řetězce (které jsou také seznamy) a na generátor seznamu.
+Stejně jako nákupní seznamy v reálném světě, seznamy v Haskellu jsou velmi užitečné. Je to nejvíce používaná datová struktura a může být použita na mnoho různých způsobů pro modelování a řešení spoustu problémů. Seznamy jsou TAK skvělé. V této sekci se podíváme na základy práce se seznamy, řetězce (které jsou také seznamy) a na generátor seznamu.
 </p>
 <p>
 V Haskellu jsou seznamy <em>homogenní</em> datová struktura. Ukládá několik prvků stejného typu. Což znamená, že můžeme mít seznam čísel nebo seznam znaků, ale nemůžeme mít seznam, který obsahuje několik čísel a poté několik znaků. A nyní, seznam!
