@@ -13,13 +13,13 @@ header("Cache-control: public");
 <pubDate><?=$last_modified?></pubDate>
 <language>cs</language>
 
-<? foreach($lines as $line): ?>
-    <? if($line): ?>
+<?php foreach($lines as $line): ?>
+    <?php if($line): ?>
         <item>
         <title><?=$line?></title>
         <link>http://naucte-se.haskell.cz/kapitoly</link>
         </item>
-    <? endif; ?>
-<? endforeach; ?>
+    <?php endif; ?>
+<?php endforeach; ?>
 </channel>
 </rss>

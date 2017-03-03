@@ -1,4 +1,5 @@
-<?  $request_uri = $_SERVER['REQUEST_URI'];
+<?php
+    $request_uri = $_SERVER['REQUEST_URI'];
     $params = substr($request_uri,strlen(dirname($_SERVER['SCRIPT_NAME'])));
     $params = strtolower(trim($params, '/'));
     $_P = $params != "" ? explode('/',$params) : array();
@@ -154,12 +155,12 @@
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
    "http://www.w3.org/TR/html4/strict.dtd">
-<? if (!$_P): ?>
+<?php if (!$_P): ?>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Naučte se Haskell!</title>
-<? include('base.php') ?>
+<?php include('base.php') ?>
 <style type="text/css">
 	@import url('reset.css');
 	@import url('style.css');
@@ -187,10 +188,10 @@
             <a href="rss.php" class="index-rss">RSS</a>
         </div>
     </div>
-<? include('analytics.php') ?>
+<?php include('analytics.php') ?>
 </body>
 </html>
 
-<? else: ?>
-<? include('kapitola.php'); ?>
-<? endif; ?>
+<?php else: ?>
+<?php include('kapitola.php'); ?>
+<?php endif; ?>

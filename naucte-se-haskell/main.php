@@ -1,1 +1,1 @@
-<? $a=0; //empty file ?>
+<?php $a=0; //empty file ?>

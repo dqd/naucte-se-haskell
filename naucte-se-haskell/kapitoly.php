@@ -1,15 +1,15 @@
 <h1>Naučte se Haskell!</h1>
     <ol class="chapters">
-    <? foreach($contents as $link => $info): ?>
+    <?php foreach($contents as $link => $info): ?>
         <li>
             <a href="<?=$link?>"><?=$info['title']?></a>
             <ul>
-                <? foreach($info['subchapters'] as $anchor => $title): ?>
+                <?php foreach($info['subchapters'] as $anchor => $title): ?>
                     <li><a href="<?=$link?>#<?=$anchor?>"><?=$title?></a></li>  
-                <? endforeach; ?>
+                <?php endforeach; ?>
             </ul>
         </li>
-    <? endforeach; ?>
+    <?php endforeach; ?>
     </ol>
     <h2>Připravuje se</h2>
     <ul class="chapters" style="list-style-type:none">
