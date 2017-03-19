@@ -1,28 +1,54 @@
 <div class="english-version"><a href="http://learnyouahaskell.com/making-our-own-types-and-typeclasses">English version</a></div>
 <h1><?=$contents[$_P[0]]['title']?></h1>
-<p>Předchozí kapitoly se týkaly několika existujích haskellových typů a typových tříd. V této kapitole se naučíme vytvářet si naše vlastní a jak s nimi pracovat!</p>
-<div class="translation">Tady <a href="http://dqd.cz/">překladatel</a> prozatím skončil. Můžete navštívit IRC kanál <a href="irc://irc.freenode.net/haskell.cz">#haskell.cz</a> a povzbudit ho, případně přímo přispět překladem na <a href="https://github.com/dqd/naucte-se-haskell">githubu</a>.</div>
+
+
 <a name="algebraicke-datove-typy"></a><h2><?=$contents[$_P[0]]['subchapters']['algebraicke-datove-typy']?></h2>
-<p>So far, we've run into a lot of data types. <span class="fixed">Bool</span>, <span class="fixed">Int</span>, <span class="fixed">Char</span>, <span class="fixed">Maybe</span>, etc. But how do we make our own? Well, one way is to use the <em>data</em> keyword to define a type. Let's see how the <span class="fixed">Bool</span> type is defined in the standard library.</p>
+<!DOCTYPE html>
+<html>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"> 
+<!--
+<div class="english-version"><a href="http://learnyouahaskell.com/making-our-own-types-and-typeclasses">English version</a></div>
+<h1><?=$contents[$_P[0]]['title']?></h1>-->
+<p>Předchozí kapitoly se týkaly několika existujích haskellových typů a typových tříd. V této kapitole se naučíme vytvářet si naše vlastní a jak s nimi pracovat!</p>
+
+<p>Do této chvíle jsme narazili na celou řadu datových typů. <span class="fixed">Bool</span>, <span class="fixed">Int</span>, <span class="fixed">Char</span>, <span class="fixed">Maybe</span>, atd. Jak si ale vytvoříme své vlastní typy? Jeden způsob definice typu spočívá v použití klíčového slova <em>data</em>. Podívejme se jak je ve standardní knihovně definován typ <span class="fixed">Bool</span>.</p>
 <pre name="code" class="haskell:hs">
 data Bool = False | True
-</pre><p><span class="fixed">data</span> means that we're defining a new data type. The part before the <span class="fixed">=</span> denotes the type, which is <span class="fixed">Bool</span>. The parts after the <span class="fixed">=</span> are <em>value constructors</em>. They specify the different values that this type can have. The <span class="fixed">|</span> is read as <i>or</i>. So we can read this as: the <span class="fixed">Bool</span> type can have a value of <span class="fixed">True</span> or <span class="fixed">False</span>. Both the type name and the value constructors have to be capital cased.</p>
+</pre>
+<p>Klíčové slovo <span class="fixed">data</span> uvádí definici nového datového typu. Následuje název definovaného typu, jímž je v tomto případě <span class="fixed">Bool</span>. Vpravo od rovnítka <span class="fixed">=</span> jsou <em>konstruktory hodnoty</em>. 
+Ty určují přípustné hodnoty typu.  Znak <span class="fixed">|</span> se čte jako <i>or</i> (nebo). Zápis lze tedy číst jako: typ <span class="fixed">Bool</span> může mít hodnotu <span class="fixed">True</span> nebo <span class="fixed">False</span>. Jak název typu tak názvy konstruktorů hodnot musí začínat velkými písmeny.</p>
 
-<p>In a similar fashion, we can think of the <span class="fixed">Int</span> type as being defined like this:</p>
+<p>Podobným způsobem můžeme nazírat na definici typu <span class="fixed">Int</span>:</p>
 <pre name="code" class="haskell:hs">
 data Int = -2147483648 | -2147483647 | ... | -1 | 0 | 1 | 2 | ... | 2147483647
 </pre>
 <img src="images/http://s3.amazonaws.com/lyah/caveman.png" alt="caveman" class="left" width="220" height="215">
-<p>The first and last value constructors are the minimum and maximum possible values of <span class="fixed">Int</span>. It's not actually defined like this, the ellipses are here because we omitted a heapload of numbers, so this is just for illustrative purposes.</p>
-<p>Now, let's think about how we would represent a shape in Haskell. One way would be to use tuples. A circle could be denoted as <span class="fixed">(43.1, 55.0, 10.4)</span> where the first and second fields are the coordinates of the circle's center and the third field is the radius. Sounds OK, but those could also represent a 3D vector or anything else. A better solution would be to make our own type to represent a shape. Let's say that a shape can be a circle or a rectangle. Here it is:</p>
+<p>První a poslední hodnoty konstruktrů jsou minimální a maximální možné hodnoty typu <span class="fixed">Int</span>. Skutečná definice se poněkud liší, protože v této naší ilustraci jsme celou řadu čísel nahradili třemi tečkami.</p>
+<p>Pojďme se nyní zamyslet nad tím, jak bychom prezentovali tvar v Haskellu. Jednou možností je použití entic (tuples). Kružnici lze vyjádřit objektem  <span class="fixed">(43.1, 55.0, 10.4)</span> 
+kde první a druhé pole jsou souřadnice středu kružnice a třetí pole je její poloměr. To vypadá nadějně ale stejná čísla mohou také vyjadřovat třírozměrný vektor nebo cokoliv jiného. Lepším způsobem je vytvoření vlastního typu pro prezentaci tvaru. Řekněmež, že tvarem bude kružnice nebo obdélník. Vyjádření takového dvoudomého tvaru může vypadat následovně:</p>
 
 <pre name="code" class="haskell:hs">
 data Shape = Circle Float Float Float | Rectangle Float Float Float Float 
 </pre>
 <p>
-Now what's this? Think of it like this. The <span class="fixed">Circle</span> value constructor has three fields, which take floats. So when we write a value constructor, we can optionally add some types after it and those types define the values it will contain. Here, the first two fields are the coordinates of its center, the third one its radius. The <span class="fixed">Rectangle</span> value constructor has four fields which accept floats. The first two are the coordinates to its upper left corner and the second two are coordinates to its lower right one.
+Copak to tu máme? Konstuktor typu <span class="fixed">Shape</span> se skládá ze dvou konstruktorů hodnoty <em>Circle</em> a <em>Rectangle</em>. Konstruktor hodnoty <span class="fixed">Circle</span> má tři pole pro hodnoty typu <em>float</em>. 
+<!--
+So when we write a value constructor, we can optionally add some types after it and those types define the values it will contain.--> 
+První dvě pole jsou pro souřadnice středu kružnice, třetí pro její poloměr. Konstruktor hodnoty <span class="fixed">Rectangle</span> má čtyři pole typu float. První dvě jsou pro souřadnice levého horního rohu, zbylé dvě pro souřadnice pravého dolního rohu obdélníka.</p>
+<p>Kdybychom to náhodou potřebovali a pokusili se v editoru <span class="fixed">ghci</span> vytisknout <span class="fixed">Circle 10 20 5</span>, vyvoláme chybové hlášení. Haskell (zatím) neumí vytisknout náš datový typ jako řetězec. Lze to zařídit tak, že se náš typ <span class="fixed">Shape</span> stane součástí typu <span class="fixed">Show</span> a to připojením <span class="fixed">deriving (Show)</span> na konec deklarace typu: </p>
+<pre name="code" class="haskell:hs">
+data Shape = Circle Float Float Float | Rectangle Float Float Float Float deriving (Show)
+</pre>
+<p>Nyní si tedy můžeme (pokud máme potřebu) tisknout:</p>
+<pre name="code" class="haskell:hs">
+ghci&gt; Circle 10 20 5
+Circle 10.0 20.0 5.0
+ghci&gt; Rectangle 50 230 60 90
+Rectangle 50.0 230.0 60.0 90.0
+
+</pre>
+<p>Řekneme-li pole, míníme ve skutečnosti parametry. Konstruktory hodnoty jsou vlastně funkce, které vracejí hodnoty daného typu. Podívejme se na signatury typů pro tyto dva konstruktory hodnot.  
 </p>
-<p>Now when I say fields, I actually mean parameters. Value constructors are actually functions that ultimately return a value of a data type. Let's take a look at the type signatures for these two value constructors.</p>
 <pre name="code" class="haskell:hs">
 ghci&gt; :t Circle
 Circle :: Float -&gt; Float -&gt; Float -&gt; Shape
@@ -30,13 +56,18 @@ ghci&gt; :t Rectangle
 Rectangle :: Float -&gt; Float -&gt; Float -&gt; Float -&gt; Shape
 
 </pre>
-<p>Cool, so value constructors are functions like everything else. Who would have thought? Let's make a function that takes a shape and returns its surface.</p>
+<p>Bezva, takže konstruktory jsou funkce, kdo by si to byl pomyslil. Vytvořme funkci, která jako argument přijímá strukturovanou hodnotu typu <em>Shape</em> (tvar) a vrací jeho plochu.</p>
 <pre name="code" class="haskell:hs">
 surface :: Shape -&gt; Float
 surface (Circle _ _ r) = pi * r ^ 2
 surface (Rectangle x1 y1 x2 y2) = (abs $ x2 - x1) * (abs $ y2 - y1)
 </pre>
-<p>The first notable thing here is the type declaration. It says that the function takes a shape and returns a float. We couldn't write a type declaration of <span class="fixed">Circle -&gt; Float</span> because <span class="fixed">Circle</span> is not a type, <span class="fixed">Shape</span> is. Just like we can't write a function with a type declaration of <span class="fixed">True -&gt; Int</span>. The next thing we notice here is that we can pattern match against constructors. We pattern matched against constructors before (all the time actually) when we pattern matched against values like <span class="fixed">[]</span> or <span class="fixed">False</span> or <span class="fixed">5</span>, only those values didn't have any fields. We just write a constructor and then bind its fields to names. Because we're interested in the radius, we don't actually care about the first two fields, which tell us where the circle is.</p>
+<p>První věcí hodnou pozoru je zde deklarace typu. Ta říká, že funkce přijímá hodnotu typu Shape a vrací hodnotu typu Float. Nemůžeme napsat, že např. <span class="fixed">Circle -&gt; Float</span> protože <span class="fixed">Circle</span> není název typu, zatímco <span class="fixed">Shape</span> ano. Stejně tak bychom nemohli napsat funkci s deklarací, že <span class="fixed">True -&gt; Int</span>. Dále si zde povšimneme, že můžeme deklarovat parametry funkce porovnáním (pattern matching) s parametry datového konstruktoru. Jednoduše napíšeme konstruktor a poté propojíme jeho pole se jmény. Protože nás zajímá poloměr, nestaráme se o první dvě pole, udávající polohu kružnice - to jsme vyjádřili použitím podtržítek na odpovídajících místech výčtu parametrů.
+<!--
+Toto porovnávání (pattern matching) s konstruktory jsme prováděli již dříve (vlastně vždy), když jsme ... We pattern matched against constructors before (all the time actually) when we pattern matched against values like <span class="fixed">[]</span> or <span class="fixed">False</span> or <span class="fixed">5</span>, only those values didn't have any fields.
+-->
+</p>
+<p>Tato podtržítka nám ovšem zjednodušila pouze definici funkce, protože při jejím volání musíme stejně zadat všechny hodnoty pro datový konstruktor - vyzkoušejte si volání funkce s podtržítky místo prvních dvou argumentů:</p>
 
 <pre name="code" class="haskell:hs">
 ghci&gt; surface $ Circle 10 20 10
@@ -44,7 +75,8 @@ ghci&gt; surface $ Circle 10 20 10
 ghci&gt; surface $ Rectangle 0 0 100 100
 10000.0
 </pre>
-<p>Yay, it works! But if we try to just print out <span class="fixed">Circle 10 20 5</span> in the prompt, we'll get an error. That's because Haskell doesn't know how to display our data type as a string (yet). Remember, when we try to print a value out in the prompt, Haskell first runs the <span class="fixed">show</span> function to get the string representation of our value and then it prints that out to the terminal. To make our <span class="fixed">Shape</span> type part of the <span class="fixed">Show</span> typeclass, we modify it like this: </p>
+<!--
+<p>Hele, ono to chodí! But if we try to just print out <span class="fixed">Circle 10 20 5</span> in the prompt, we'll get an error. That's because Haskell doesn't know how to display our data type as a string (yet). Remember, when we try to print a value out in the prompt, Haskell first runs the <span class="fixed">show</span> function to get the string representation of our value and then it prints that out to the terminal. To make our <span class="fixed">Shape</span> type part of the <span class="fixed">Show</span> typeclass, we modify it like this: </p>
 
 <pre name="code" class="haskell:hs">
 data Shape = Circle Float Float Float | Rectangle Float Float Float Float deriving (Show)
@@ -57,43 +89,46 @@ ghci&gt; Rectangle 50 230 60 90
 Rectangle 50.0 230.0 60.0 90.0
 
 </pre>
-<p>Value constructors are functions, so we can map them and partially apply them and everything. If we want a list of concentric circles with different radii, we can do this.</p>
+-->
+<p>Datové (hodnotové) konstruktory jsou funkce, takže je můžeme použít jako argument funkce <em>map</em>, v částečné aplikaci a jinde. Chceme-li seznam soustředných kružnic s různými poloměry, můžeme napsat toto:</p>
 <pre name="code" class="haskell:hs">
 ghci&gt; map (Circle 10 20) [4,5,6,6]
 [Circle 10.0 20.0 4.0,Circle 10.0 20.0 5.0,Circle 10.0 20.0 6.0,Circle 10.0 20.0 6.0]
 </pre>
-<p>Our data type is good, although it could be better. Let's make an intermediate data type that defines a point in two-dimensional space. Then we can use that to make our shapes more understandable.</p>
+<p>Náš datový typ je výtečný i když by mohl být ještě lepší. Vytvořme mezilehlý datový typ pro deklaraci bodu ve dvourozměrném prostoru. Ten potom můžeme použít pro přehlednější vytváření tvarů.</p>
 <pre name="code" class="haskell:hs">
 data Point = Point Float Float deriving (Show)
 data Shape = Circle Point Float | Rectangle Point Point deriving (Show)
 </pre>
-<p>Notice that when defining a point, we used the same name for the data type and the value constructor. This has no special meaning, although it's common to use the same name as the type if there's only one value constructor. So now the <span class="fixed">Circle</span> has two fields, one is of type <span class="fixed">Point</span> and the other of type <span class="fixed">Float</span>. This makes it easier to understand what's what. Same goes for the rectangle. We have to adjust our <span class="fixed">surface</span> function to reflect these changes.</p>
+<p>Všimněte si, že jsme při definici bodu použili stejné jméno jak pro typový tak pro datový konstruktor, což je obvyklé u typů s jedním datovým konstruktorem (hodnoty). Takže nyní má <span class="fixed">Circle</span> dvě pole, jedno typu <span class="fixed">Point</span> a druhé typu <span class="fixed">Float</span>. Deklarace typu kružnice je takto přehlednější. Totéž platí pro obdélník. Musíme ovšem upravit funkci <span class="fixed">surface</span> aby reflektovala zavedenou změnu.</p>
 
 <pre name="code" class="haskell:hs">
 surface :: Shape -> Float
 surface (Circle _ r) = pi * r ^ 2
 surface (Rectangle (Point x1 y1) (Point x2 y2)) = (abs $ x2 - x1) * (abs $ y2 - y1)
 </pre>
-<p>The only thing we had to change were the patterns. We disregarded the whole point in the circle pattern. In the rectangle pattern, we just used a nested pattern matching to get the fields of the points. If we wanted to reference the points themselves for some reason, we could have used as-patterns.</p>
+<p>Se zavedením typu Point pro bod musíme upravit definici funkce surface:</p> 
+<!--
+The only thing we had to change were the patterns. We disregarded the whole point in the circle pattern. In the rectangle pattern, we just used a nested pattern matching to get the fields of the points. If we wanted to reference the points themselves for some reason, we could have used as-patterns.</p>-->
 <pre name="code" class="haskell:hs">
 ghci&gt; surface (Rectangle (Point 0 0) (Point 100 100))
 10000.0
 ghci&gt; surface (Circle (Point 0 0) 24)
 1809.5574
 </pre>
-<p>How about a function that nudges a shape? It takes a shape, the amount to move it on the x axis and the amount to move it on the y axis and then returns a new shape that has the same dimensions, only it's located somewhere else.</p>
+<p>Což takhle vytvořit funkci, která bude náš tvar posunovat? Přijme tvar a velikosti posunů ve směru os x, y a vrátí nový tvar se stejnými rozměry ale s jiným umístěním.</p>
 <pre name="code" class="haskell:hs">
 nudge :: Shape -&gt; Float -&gt; Float -&gt; Shape
 nudge (Circle (Point x y) r) a b = Circle (Point (x+a) (y+b)) r
 nudge (Rectangle (Point x1 y1) (Point x2 y2)) a b = Rectangle (Point (x1+a) (y1+b)) (Point (x2+a) (y2+b))
 
 </pre>
-<p>Pretty straightforward. We add the nudge amounts to the points that denote the position of the shape.</p>
+<p>Pěkně přímočaré. Přidáváme velikosti posunů k pozicím bodů.</p>
 <pre name="code" class="haskell:hs">
 ghci&gt; nudge (Circle (Point 34 34) 10) 5 10
 Circle (Point 39.0 44.0) 10.0
 </pre>
-<p>If we don't want to deal directly with points, we can make some auxilliary functions that create shapes of some size at the zero coordinates and then nudge those.</p>
+<p>Kdybychom se nechtěli přímo zabývat pozicemi bodů, můžeme vytvořit pomocnou funkci, která vytvoří tvary ve výchozí (nulové) pozici a poté je můžeme postrkovat.</p>
 <pre name="code" class="haskell:hs">
 baseCircle :: Float -&gt; Shape
 baseCircle r = Circle (Point 0 0) r
@@ -106,8 +141,10 @@ baseRect width height = Rectangle (Point 0 0) (Point width height)
 ghci&gt; nudge (baseRect 40 100) 60 23
 Rectangle (Point 60.0 23.0) (Point 100.0 123.0)
 </pre>
-<p>You can, of course, export your data types in your modules. To do that, just write your type along with the functions you are exporting and then add some parentheses and in them specify the value constructors that you want to export for it, separated by commas. If you want to export all the value constructors for a given type, just write <span class="fixed">..</span>.</p>
-<p>If we wanted to export the functions and types that we defined here in a module, we could start it off like this:</p>
+<p>Své datové typy můžete exportovat do vlastního modulu. Modul v Haskellu je část zdrojového kódu počínající deklarací názvu modulu. Zdrojový soubor může obsahovat jeden či více modulů případně jeden modul může zabírat více souborů.</br>
+Modul zajisté vytváříme proto, abychom jej mohli v jiném modulu nebo skriptu importovat.</p>
+<p>Název modulu je součástí záhlaví, v němž jsou v závorce uvedeny zamýšlené deklarace funkcí, tříd a instancí, dat a typů. Chceme-li exportovat všechny datové konstruktory daného typu, projevíme to zápisem (<span class="fixed">..</span>) za názvem typu.</p>
+<p>Export našich objektů, souvisejících s tvarem můžeme tedy provést touto formou:</p>
 <pre name="code" class="haskell:hs">
 module Shapes 
 ( Point(..)
@@ -118,9 +155,12 @@ module Shapes
 , baseRect
 ) where
 </pre>
-<p>By doing <span class="fixed">Shape(..)</span>, we exported all the value constructors for <span class="fixed">Shape</span>, so that means that whoever imports our module can make shapes by using the <span class="fixed">Rectangle</span> and <span class="fixed">Circle</span> value constructors. It's the same as writing <span class="fixed">Shape (Rectangle, Circle)</span>.</p>
+<p>Zápisem např. <span class="fixed">Shape(..)</span> exportujeme všechny datové konstruktory typu <span class="fixed">Shape</span>, což znamená, že kdokoli importuje náš modul, může vytvářet tvary spoužitím datových konstruktorů <span class="fixed">Rectangle</span> a <span class="fixed">Circle</span>. Uvedený zápis je evivalentní zápisu <span class="fixed">Shape (Rectangle, Circle)</span>.</p>
 
-<p>We could also opt not to export any value constructors for <span class="fixed">Shape</span> by just writing <span class="fixed">Shape</span> in the export statement. That way, someone importing our module could only make shapes by using the auxilliary functions <span class="fixed">baseCircle</span> and <span class="fixed">baseRect</span>. <span class="fixed">Data.Map</span> uses that approach. You can't create a map by doing <span class="fixed">Map.Map [(1,2),(3,4)]</span> because it doesn't export that value constructor. However, you can make a mapping by using one of the auxilliary functions like <span class="fixed">Map.fromList</span>. Remember, value constructors are just functions that take the fields as parameters and return a value of some type (like <span class="fixed">Shape</span>) as a result. So when we choose not to export them, we just prevent the person importing our module from using those functions, but if some other functions that are exported return a type, we can use them to make values of our custom data types.</p>
+<p>Můžeme také chtít neexportovat žádné datové konstruktory typu  <span class="fixed">Shape</span>. V tom případě v exportní deklaraci uvedeme pouze název typového konstruktoru <span class="fixed">Shape</span>.
+<div class="translation">Tady <a href="http://dqd.cz/">překladatel</a> prozatím skončil. Můžete navštívit IRC kanál <a href="irc://irc.freenode.net/haskell.cz">#haskell.cz</a> a povzbudit ho, případně přímo přispět překladem na <a href="https://github.com/dqd/naucte-se-haskell">githubu</a>.</div>
+
+That way, someone importing our module could only make shapes by using the auxilliary functions <span class="fixed">baseCircle</span> and <span class="fixed">baseRect</span>. <span class="fixed">Data.Map</span> uses that approach. You can't create a map by doing <span class="fixed">Map.Map [(1,2),(3,4)]</span> because it doesn't export that value constructor. However, you can make a mapping by using one of the auxilliary functions like <span class="fixed">Map.fromList</span>. Remember, value constructors are just functions that take the fields as parameters and return a value of some type (like <span class="fixed">Shape</span>) as a result. So when we choose not to export them, we just prevent the person importing our module from using those functions, but if some other functions that are exported return a type, we can use them to make values of our custom data types.</p>
 
 <p>Not exporting the value constructors of a data types makes them more abstract in such a way that we hide their implementation. Also, whoever uses our module can't pattern match against the value constructors.</p>
 <a name="zaznamy"></a><h2><?=$contents[$_P[0]]['subchapters']['zaznamy']?></h2>
@@ -1139,3 +1179,4 @@ instance Functor (Barry a b) where
 </pre>
 <p>There we go! We just mapped the <span class="fixed">f</span> over the first field.</p>
 <p>In this section, we took a good look at how type parameters work and kind of formalized them with kinds, just like we formalized function parameters with type declarations. We saw that there are interesting parallels between functions and type constructors. They are, however, two completely different things. When working on real Haskell, you usually won't have to mess with kinds and do kind inference by hand like we did now. Usually, you just have to partially apply your own type to <span class="fixed">* -&gt; *</span> or <span class="fixed">*</span> when making it an instance of one of the standard typeclasses, but it's good to know how and why that actually works. It's also interesting to see that types have little types of their own. Again, you don't really have to understand everything we did here to read on, but if you understand how kinds work, chances are that you have a very solid grasp of Haskell's type system.</p>
+
