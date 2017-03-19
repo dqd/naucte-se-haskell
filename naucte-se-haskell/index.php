@@ -210,8 +210,7 @@
     <div class="splashdiv">
         <div class="introtext">
             <p>Vítejte! Tohle je příručka programovacího jazyka Haskell pro začátečníky! Autora příručky můžete nalézt na IRC kanálu <a href="irc://irc.freenode.net/haskell">#haskell</a>, kde se vyskytuje pod přezdívkou <em>BONUS</em>.</p>
-            <p>Původní příručku v angličtině můžete najít na webu <a href="http://learnyouahaskell.com/">learnyouahaskell.com</a>. Případné chyby v překladu a připomínky k němu lze nahlásit na IRC kanálu <a href="irc://irc.freenode.net/haskell.cz">#haskell.cz</a>. Do češtiny překládá <a href="http://dqd.cz/">dqd</a>.</p>
-            <p>Kromě toho se můžete podívat na autorův <a href="http://twitter.com/bonus500">twitter</a>!</p>
+            <p>Původní příručku v angličtině naleznete na webu <a href="http://learnyouahaskell.com/">learnyouahaskell.com</a>. Případné chyby v překladu a připomínky k němu lze nahlásit na IRC kanálu <a href="irc://irc.freenode.net/haskell.cz">#haskell.cz</a>. Do češtiny překládá <a href="http://dqd.cz/">dqd</a>.</p>
         </div>
         <div class="go">
             <a href="kapitoly" class="index-read">Začít číst!</a>
