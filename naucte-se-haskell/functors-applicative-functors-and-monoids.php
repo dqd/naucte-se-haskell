@@ -1,29 +1,40 @@
 <h1><?=$contents['functors-applicative-functors-and-monoids']['title']?></h1>
 <p>Haskell's combination of purity, higher order functions, parameterized algebraic data types, and typeclasses allows us to implement polymorphism on a much higher level than possible in other languages. We don't have to think about types belonging to a big hierarchy of types. Instead, we think about what the types can act like and then connect them with the appropriate typeclasses. An <span class="fixed">Int</span> can act like a lot of things. It can act like an equatable thing, like an ordered thing, like an enumerable thing, etc.</p>
 <p>Typeclasses are open, which means that we can define our own data type, think about what it can act like and connect it with the typeclasses that define its behaviors. Because of that and because of Haskell's great type system that allows us to know a lot about a function just by knowing its type declaration, we can define typeclasses that define behavior that's very general and abstract. We've met typeclasses that define operations for seeing if two things are equal or comparing two things by some ordering. Those are very abstract and elegant behaviors, but we just don't think of them as anything very special because we've been dealing with them for most of our lives. We recently met functors, which are basically things that can be mapped over. That's an example of a useful and yet still pretty abstract property that typeclasses can describe. In this chapter, we'll take a closer look at functors, along with slightly stronger and more useful versions of functors called applicative functors. We'll also take a look at monoids, which are sort of like socks.</p>
-<a name="functors-redux"></a><h2><?=$contents[$_P[0]]['subchapters']['functors-redux']?></h2>
-<img src="images/frogtor.png" alt="frogs dont even need money" class="right" width="369" height="243">
+<a name="functors-redux"></a><h2>Functors redux</h2>
+<img src="http://s3.amazonaws.com/lyah/frogtor.png" alt="frogs dont even need money" class="right" width="369" height="243">
 <p>We've already talked about functors in <a href="making-our-own-types-and-typeclasses#the-functor-typeclass">their own little section</a>. If you haven't read it yet, you should probably give it a glance right now, or maybe later when you have more time. Or you can just pretend you read it.</p>
 <p>Still, here's a quick refresher: Functors are things that can be mapped over, like lists, <span class="fixed">Maybe</span>s, trees, and such. In Haskell, they're described by the typeclass <span class="fixed">Functor</span>, which has only one typeclass method, namely <span class="fixed">fmap</span>, which has a type of <span class="fixed">fmap :: (a -&gt; b) -&gt; f a -&gt; f b</span>. It says: give me a function that takes an <span class="fixed">a</span> and returns a <span class="fixed">b</span> and a box with an <span class="fixed">a</span> (or several of them) inside it and I'll give you a box with a <span class="fixed">b</span> (or several of them) inside it. It kind of applies the function to the element inside the box.</p>
 <div class="hintbox"><em>A word of advice.</em> Many times the box analogy is used to help you get some intuition for how functors work, and later, we'll probably use the same analogy for applicative functors and monads. It's an okay analogy that helps people understand functors at first, just don't take it too literally, because for some functors the box analogy has to be stretched really thin to still hold some truth. A more correct term for what a functor is would be <i>computational context</i>. The context might be that the computation can have a value or it might have failed (<span class="fixed">Maybe</span> and <span class="fixed">Either a</span>) or that there might be more values (lists), stuff like that.</div>
 <p>If we want to make a type constructor an instance of <span class="fixed">Functor</span>, it has to have a kind of <span class="fixed">* -&gt; *</span>, which means that it has to take exactly one concrete type as a type parameter. For example, <span class="fixed">Maybe</span> can be made an instance because it takes one type parameter to produce a concrete type, like <span class="fixed">Maybe Int</span> or <span class="fixed">Maybe String</span>. If a type constructor takes two parameters, like <span class="fixed">Either</span>, we have to partially apply the type constructor until it only takes one type parameter. So we can't write <span class="fixed">instance Functor Either where</span>, but we can write <span class="fixed">instance Functor (Either a) where</span> and then if we imagine that <span class="fixed">fmap</span> is only for <span class="fixed">Either a</span>, it would have a type declaration of <span class="fixed">fmap :: (b -&gt; c) -&gt; Either a b -&gt; Either a c</span>. As you can see, the <span class="fixed">Either a</span> part is fixed, because <span class="fixed">Either a</span> takes only one type parameter, whereas just <span class="fixed">Either</span> takes two so <span class="fixed">fmap :: (b -&gt; c) -&gt; Either b -&gt; Either c</span> wouldn't really make sense.</p>
 <p>We've learned by now how a lot of types (well, type constructors really) are instances of <span class="fixed">Functor</span>, like <span class="fixed">[]</span>, <span class="fixed">Maybe</span>, <span class="fixed">Either a</span> and a <span class="fixed">Tree</span> type that we made on our own. We saw how we can map functions over them for great good. In this section, we'll take a look at two more instances of functor, namely <span class="fixed">IO</span> and <span class="fixed">(-&gt;) r</span>.</p>
 <p>If some value has a type of, say, <span class="fixed">IO String</span>, that means that it's an I/O action that, when performed, will go out into the real world and get some string for us, which it will yield as a result. We can use <span class="fixed">&lt;-</span> in <i>do</i> syntax to bind that result to a name. We mentioned that I/O actions are like boxes with little feet that go out and fetch some value from the outside world for us. We can inspect what they fetched, but after inspecting, we have to wrap the value back in <span class="fixed">IO</span>. By thinking about this box with little feet analogy, we can see how <span class="fixed">IO</span> acts like a functor.</p>
-<p>The <span class="fixed">IO a</span> type doesn't expose any value constructors, because I/O is implementation dependent. This forces us to keep our I/O code and our pure code separated. That's why we can't see exactly how <span class="fixed">IO</span> is an instance of <span class="fixed">Functor</span>, but we can play around with it to gain some intuition. It's pretty simple really. Check out this piece of code:</p>
+<p>
+Let's see how <span class="fixed">IO</span> is an instance of <span class="fixed">Functor</span>. When we <span class="fixed">fmap</span> a function over an I/O action, we want to get back an I/O action that does the same thing, but has our function applied over its result value.</p>
 <pre name="code" class="haskell:hs">
-main = do line &lt;- getLine 
+instance Functor IO where
+    fmap f action = do
+        result &lt;- action
+        return (f result)
+</pre>
+<p>
+The result of mapping something over an I/O action will be an I/O action, so right off the bat we use <i>do</i> syntax to glue two actions and make a new one. In the implementation for <span class="fixed">fmap</span>, we make a new I/O action that first performs the original I/O action and calls its result <span class="fixed">result</span>. Then, we do <span class="fixed">return (f result)</span>. <span class="fixed">return</span> is, as you know, a function that makes an I/O action that doesn't do anything but only presents something as its result. The action that a <i>do</i> block produces will always have the result value of its last action. That's why we use return to make an I/O action that doesn't really do anything, it just presents <span class="fixed">f result</span> as the result of the new I/O action.
+</p><p>We can play around with it to gain some intuition. It's pretty simple really. Check out this piece of code:</p>
+<pre name="code" class="haskell:hs">
+main = do line &lt;- getLine
           let line' = reverse line
-          putStrLn "You said " ++ line' ++ " backwards!"
-          putStrLn "Yes, you really said" ++ line' ++ " backwards!"
+          putStrLn $ "You said " ++ line' ++ " backwards!"
+          putStrLn $ "Yes, you really said" ++ line' ++ " backwards!"
 </pre>
 <p>The user is prompted for a line and we give it back to the user, only reversed. Here's how to rewrite this by using <span class="fixed">fmap</span>:</p>
 <pre name="code" class="haskell:hs">
 main = do line &lt;- fmap reverse getLine
-          putStrLn "You said " ++ line ++ " backwards!"
-          putStrLn "Yes, you really said" ++ line ++ " backwards!"
+          putStrLn $ "You said " ++ line ++ " backwards!"
+          putStrLn $ "Yes, you really said" ++ line ++ " backwards!"
 </pre>
-<img src="images/alien.png" alt="w00ooOoooOO" class="left" width="262" height="212">
+<img src="http://s3.amazonaws.com/lyah/alien.png" alt="w00ooOoooOO" class="left" width="262" height="212">
 <p>Just like when we <span class="fixed">fmap</span> <span class="fixed">reverse</span> over <span class="fixed">Just "blah"</span> to get <span class="fixed">Just "halb"</span>, we can <span class="fixed">fmap</span> <span class="fixed">reverse</span> over <span class="fixed">getLine</span>. <span class="fixed">getLine</span> is an I/O action that has a type of <span class="fixed">IO String</span> and mapping <span class="fixed">reverse</span> over it gives us an I/O action that will go out into the real world and get a line and then apply <span class="fixed">reverse</span> to its result. Like we can apply a function to something that's inside a <span class="fixed">Maybe</span> box, we can apply a function to what's inside an <span class="fixed">IO</span> box, only it has to go out into the real world to get something. Then when we bind it to a name by using <span class="fixed">&lt;-</span>, the name will reflect the result that already has <span class="fixed">reverse</span> applied to it.</p>
+<p>The I/O action <span class="fixed">fmap (++"!") getLine</span> behaves just like <span class="fixed">getLine</span>, only that its result always has <span class="fixed">"!"</span> appended to it!</p>
 <p>If we look at what <span class="fixed">fmap</span>'s type would be if it were limited to <span class="fixed">IO</span>, it would be <span class="fixed">fmap :: (a -&gt; b) -&gt; IO a -&gt; IO b</span>. <span class="fixed">fmap</span> takes a function and an I/O action and returns a new I/O action that's like the old one, except that the function is applied to its contained result.</p>
 <p>If you ever find yourself binding the result of an I/O action to a name, only to apply a function to that and call that something else, consider using <span class="fixed">fmap</span>, because it looks prettier. If you want to apply multiple transformations to some data inside a functor, you can declare your own function at the top level, make a lambda function or ideally, use function composition:</p>
 <pre name="code" class="haskell:hs">
@@ -71,9 +82,9 @@ ghci&gt; fmap (show . (*3)) (*100) 1
 "300"
 </pre>
 <p>We can call <span class="fixed">fmap</span> as an infix function so that the resemblance to <span class="fixed">.</span> is clear. In the second input line, we're mapping <span class="fixed">(*3)</span> over <span class="fixed">(+100)</span>, which results in a function that will take an input, call <span class="fixed">(+100)</span> on that and then call <span class="fixed">(*3)</span> on that result. We call that function with <span class="fixed">1</span>.</p>
-<p>How does the box analogy hold here? Well, if you stretch it, it holds. When we use <span class="fixed">fmap (+3)</span> over <span class="fixed">Just 3</span>, it's easy to imagine the <span class="fixed">Maybe</span> as a box that has some contents on which we apply the function <span class="fixed">(*3)</span>. But what about when we're doing <span class="fixed">fmap (*3) (+100)</span>? Well, you can think of the function <span class="fixed">(+100)</span> as a box that contains its eventual result. Sort of like how an I/O action can be thought of as a box that will go out into the real world and fetch some result. Using <span class="fixed">fmap (*3)</span> on <span class="fixed">(+100)</span> will create another function that acts like <span class="fixed">(+100)</span>, only before producing a result, <span class="fixed">(*3)</span> will be applied to that result. Now we can see how <span class="fixed">fmap</span> acts just like <span class="fixed">.</span> for functions.</p>
+<p>How does the box analogy hold here? Well, if you stretch it, it holds. When we use <span class="fixed">fmap (+3)</span> over <span class="fixed">Just 3</span>, it's easy to imagine the <span class="fixed">Maybe</span> as a box that has some contents on which we apply the function <span class="fixed">(+3)</span>. But what about when we're doing <span class="fixed">fmap (*3) (+100)</span>? Well, you can think of the function <span class="fixed">(+100)</span> as a box that contains its eventual result. Sort of like how an I/O action can be thought of as a box that will go out into the real world and fetch some result. Using <span class="fixed">fmap (*3)</span> on <span class="fixed">(+100)</span> will create another function that acts like <span class="fixed">(+100)</span>, only before producing a result, <span class="fixed">(*3)</span> will be applied to that result. Now we can see how <span class="fixed">fmap</span> acts just like <span class="fixed">.</span> for functions.</p>
 <p>The fact that <span class="fixed">fmap</span> is function composition when used on functions isn't so terribly useful right now, but at least it's very interesting. It also bends our minds a bit and let us see how things that act more like computations than boxes (<span class="fixed">IO</span> and <span class="fixed">(-&gt;) r</span>) can be functors. The function being mapped over a computation results in the same computation but the result of that computation is modified with the function.</p>
-<img src="images/lifter.png" alt="lifting a function is easier than lifting a million pounds" class="right" width="443" height="450">
+<img src="http://s3.amazonaws.com/lyah/lifter.png" alt="lifting a function is easier than lifting a million pounds" class="right" width="443" height="450">
 <p>Before we go on to the rules that <span class="fixed">fmap</span> should follow, let's think about the type of <span class="fixed">fmap</span> once more. Its type is <span class="fixed">fmap :: (a -&gt; b) -&gt; f a -&gt; f b</span>. We're missing the class constraint <span class="fixed">(Functor f) =&gt;</span>, but we left it out here for brevity, because we're talking about functors anyway so we know what the <span class="fixed">f</span> stands for. When we first learned about <a href="higher-order-functions#curried-functions">curried functions</a>, we said that all Haskell functions actually take one parameter. A function <span class="fixed">a -&gt; b -&gt; c</span> actually takes just one parameter of type <span class="fixed">a</span> and then returns a function <span class="fixed">b -&gt; c</span>, which takes one parameter and returns a <span class="fixed">c</span>. That's how if we call a function with too few parameters (i.e. partially apply it), we get back a function that takes the number of parameters that we left out (if we're thinking about functions as taking several parameters again). So <span class="fixed">a -&gt; b -&gt; c</span> can be written as <span class="fixed">a -&gt; (b -&gt; c)</span>, to make the currying more apparent.</p>
 <p>In the same vein, if we write <span class="fixed">fmap :: (a -&gt; b) -&gt; (f a -&gt; f b)</span>, we can think of <span class="fixed">fmap</span> not as a function that takes one function and a functor and returns a functor, but as a function that takes a function and returns a new function that's just like the old one, only it takes a functor as a parameter and returns a functor as the result. It takes an <span class="fixed">a -&gt; b</span> function and returns a function <span class="fixed">f a -&gt; f b</span>. This is called <i>lifting</i> a function. Let's play around with that idea by using GHCI's <span class="fixed">:t</span> command:</p>
 <pre name="code" class="haskell:hs">
@@ -83,7 +94,7 @@ ghci&gt; :t fmap (replicate 3)
 fmap (replicate 3) :: (Functor f) =&gt; f a -&gt; f [a]
 </pre>
 <p>The expression <span class="fixed">fmap (*2)</span> is a function that takes a functor <span class="fixed">f</span> over numbers and returns a functor over numbers. That functor can be a list, a <span class="fixed">Maybe </span>, an <span class="fixed">Either String</span>, whatever. The expression <span class="fixed">fmap (replicate 3)</span> will take a functor over any type and return a functor over a list of elements of that type.</p>
-<div class="hintbox">When we say <i>a functor over numbers</i>, you can think of that as <i>a functor that has numbers in it</i>. The former is a bit fancier and more technically correct, but the latter is usually easier to get.</div
+<div class="hintbox">When we say <i>a functor over numbers</i>, you can think of that as <i>a functor that has numbers in it</i>. The former is a bit fancier and more technically correct, but the latter is usually easier to get.</div>
 <p>This is even more apparent if we partially apply, say, <span class="fixed">fmap (++"!")</span> and then bind it to a name in GHCI.</p>
 <p>You can think of <span class="fixed">fmap</span> as either a function that takes a function and a functor and then maps that function over the functor, or you can think of it as a function that takes a function and lifts that function so that it operates on functors. Both views are correct and in Haskell, equivalent.</p>
 <p>The type <span class="fixed">fmap (replicate 3) :: (Functor f) =&gt; f a -&gt; f [a]</span> means that the function will work on any functor. What exactly it will do depends on which functor we use it on. If we use <span class="fixed">fmap (replicate 3)</span> on a list, the list's implementation for <span class="fixed">fmap</span> will be chosen, which is just <span class="fixed">map</span>. If we use it on a <span class="fixed">Maybe a</span>, it'll apply <span class="fixed">replicate 3</span> to the value inside the <span class="fixed">Just</span>, or if it's <span class="fixed">Nothing</span>, then it stays <span class="fixed">Nothing</span>.</p>
@@ -124,7 +135,7 @@ instance Functor Maybe where
 </pre>
 <p>We imagine that <span class="fixed">id</span> plays the role of the <span class="fixed">f</span> parameter in the implementation. We see that if wee <span class="fixed">fmap id</span> over <span class="fixed">Just x</span>, the result will be <span class="fixed">Just (id x)</span>, and because <span class="fixed">id</span> just returns its parameter, we can deduce that <span class="fixed">Just (id x)</span> equals <span class="fixed">Just x</span>. So now we know that if we map <span class="fixed">id</span> over a <span class="fixed">Maybe</span> value with a <span class="fixed">Just</span> value constructor, we get that same value back.</p>
 <p>Seeing that mapping <span class="fixed">id</span> over a <span class="fixed">Nothing</span> value returns the same value is trivial. So from these two equations in the implementation for <span class="fixed">fmap</span>, we see that the law <span class="fixed">fmap id = id</span> holds.</p>
-<img src="images/justice.png" alt="justice is blind, but so is my dog" class="left" width="345" height="428">
+<img src="http://s3.amazonaws.com/lyah/justice.png" alt="justice is blind, but so is my dog" class="left" width="345" height="428">
 <p><em>The second law says that composing two functions and then mapping the resulting function over a functor should be the same as first mapping one function over the functor and then mapping the other one.</em> Formally written, that means that <span class="label law">fmap (f . g) = fmap f . fmap g</span>. Or to write it in another way, for any functor <i>F</i>, the following should hold: <span class="label law">fmap (f . g) F = fmap f (fmap g F)</span>.</p>
 <p>If we can show that some type obeys both functor laws, we can rely on it having the same fundamental behaviors as other functors when it comes to mapping. We can know that when we use <span class="fixed">fmap</span> on it, there won't be anything other than mapping going on behind the scenes and that it will act like a thing that can be mapped over, i.e. a functor. You figure out how the second law holds for some type by looking at the implementation of <span class="fixed">fmap</span> for that type and then using the method that we used to check if <span class="fixed">Maybe</span> obeys the first law.</p>
 <p>If you want, we can check out how the second functor law holds for <span class="fixed">Maybe</span>. If we do <span class="fixed">fmap (f . g)</span> over <span class="fixed">Nothing</span>, we get <span class="fixed">Nothing</span>, because doing a <span class="fixed">fmap</span> with any function over <span class="fixed">Nothing</span> returns <span class="fixed">Nothing</span>. If we do <span class="fixed">fmap f (fmap g Nothing)</span>, we get <span class="fixed">Nothing</span>, for the same reason. OK, seeing how the second law holds for <span class="fixed">Maybe</span> if it's a <span class="fixed">Nothing</span> value is pretty easy, almost trivial. </p><p>How about if it's a <span class="fixed">Just <i>something</i></span> value? Well, if we do <span class="fixed">fmap (f . g) (Just x)</span>, we see from the implementation that it's implemented as <span class="fixed">Just ((f . g) x)</span>, which is, of course, <span class="fixed">Just (f (g x))</span>. If we do <span class="fixed">fmap f (fmap g (Just x))</span>, we see from the implementation that <span class="fixed">fmap g (Just x)</span> is <span class="fixed">Just (g x)</span>. Ergo, <span class="fixed">fmap f (fmap g (Just x))</span> equals <span class="fixed">fmap f (Just (g x))</span> and from the implementation we see that this equals <span class="fixed">Just (f (g x))</span>.</p>
@@ -173,11 +184,11 @@ CJust 0 "haha"
 <p>All the <span class="fixed">Functor</span> instances in the standard library obey these laws, but you can check for yourself if you don't believe me. And the next time you make a type an instance of <span class="fixed">Functor</span>, take a minute to make sure that it obeys the functor laws. Once you've dealt with enough functors, you kind of intuitively see the properties and behaviors that they have in common and it's not hard to intuitively see if a type obeys the functor laws. But even without the intuition, you can always just go over the implementation line by line and see if the laws hold or try to find a counter-example.</p>
 <p>We can also look at functors as things that output values in a context. For instance, <span class="fixed">Just 3</span> outputs the value <span class="fixed">3</span> in the context that it might or not output any values at all. <span class="fixed">[1,2,3]</span> outputs three values&mdash;<span class="fixed">1</span>, <span class="fixed">2</span>, and <span class="fixed">3</span>, the context is that there may be multiple values or no values. The function <span class="fixed">(+3)</span> will output a value, depending on which parameter it is given.</p>
 <p>If you think of functors as things that output values, you can think of mapping over functors as attaching a transformation to the output of the functor that changes the value. When we do <span class="fixed">fmap (+3) [1,2,3]</span>, we attach the transformation <span class="fixed">(+3)</span> to the output of <span class="fixed">[1,2,3]</span>, so whenever we look at a number that the list outputs, <span class="fixed">(+3)</span> will be applied to it. Another example is mapping over functions. When we do <span class="fixed">fmap (+3) (*3)</span>, we attach the transformation <span class="fixed">(+3)</span> to the eventual output of <span class="fixed">(*3)</span>. Looking at it this way gives us some intuition as to why using <span class="fixed">fmap</span> on functions is just composition (<span class="fixed">fmap (+3) (*3)</span> equals <span class="fixed">(+3) . (*3)</span>, which equals <span class="fixed">\x -&gt; ((x*3)+3)</span>), because we take a function like <span class="fixed">(*3)</span> then we attach the transformation <span class="fixed">(+3)</span> to its output. The result is still a function, only when we give it a number, it will be multiplied by three and then it will go through the attached transformation where it will be added to three. This is what happens with composition.</p>
-<a name="applicative-functors"></a><h2><?=$contents[$_P[0]]['subchapters']['applicative-functors']?></h2>
-<img src="images/present.png" class="right" width="302" height="284" alt="disregard this analogy">
+<a name="applicative-functors"></a><h2>Applicative functors</h2>
+<img src="http://s3.amazonaws.com/lyah/present.png" class="right" width="302" height="284" alt="disregard this analogy">
 <p>In this section, we'll take a look at applicative functors, which are beefed up functors, represented in Haskell by the <span class="fixed">Applicative</span> typeclass, found in the <span class="fixed">Control.Applicative</span> module.</p>
 <p>As you know, functions in Haskell are curried by default, which means that a function that seems to take several parameters actually takes just one parameter and returns a function that takes the next parameter and so on. If a function is of type <span class="fixed">a -&gt; b -&gt; c</span>, we usually say that it takes two parameters and returns a <span class="fixed">c</span>, but actually it takes an <span class="fixed">a</span> and returns a function <span class="fixed">b -&gt; c</span>. That's why we can call a function as <span class="fixed">f x y</span> or as <span class="fixed">(f x) y</span>. This mechanism is what enables us to partially apply functions by just calling them with too few parameters, which results in functions that we can then pass on to other functions.</p>
-<p>So far, when we were mapping functions over functors, we usually mapped functions that take only one parameter. But what happens when we map a function like <span class="fixed">*</span>, which takes two parameters, over a functor? Let's take a look at a couple of concrete examples of this. If we have <span class="fixed">Just 3</span> and we do <span class="fixed">fmap (*) (Just 3)</span>, what do we get? From the instance implementation of <span class="fixed">Maybe</span> for <span class="fixed">Functor</span>, we know that if it's a <span class="fixed">Just <i>something</i></span> value, it will apply the function to the <span class="fixed"><i>something</i></span> inside the <span class="fixed">Just</span>. Therefore, doing <span class="fixed">fmap (*) (Just 3)</span> results in <span class="fixed">Just ((*) 3)</span>, which can also be written as <span class="fixed">Just (3 *)</span> if we use sections. Interesting! We get a function wrapped in a <span class="fixed">Just</span>!</p> 
+<p>So far, when we were mapping functions over functors, we usually mapped functions that take only one parameter. But what happens when we map a function like <span class="fixed">*</span>, which takes two parameters, over a functor? Let's take a look at a couple of concrete examples of this. If we have <span class="fixed">Just 3</span> and we do <span class="fixed">fmap (*) (Just 3)</span>, what do we get? From the instance implementation of <span class="fixed">Maybe</span> for <span class="fixed">Functor</span>, we know that if it's a <span class="fixed">Just <i>something</i></span> value, it will apply the function to the <span class="fixed"><i>something</i></span> inside the <span class="fixed">Just</span>. Therefore, doing <span class="fixed">fmap (*) (Just 3)</span> results in <span class="fixed">Just ((*) 3)</span>, which can also be written as <span class="fixed">Just (* 3)</span> if we use sections. Interesting! We get a function wrapped in a <span class="fixed">Just</span>!</p>
 <pre name="code" class="haskell:hs">
 ghci&gt; :t fmap (++) (Just "hey")
 fmap (++) (Just "hey") :: Maybe ([Char] -&gt; [Char])
@@ -207,7 +218,7 @@ class (Functor f) =&gt; Applicative f where
 <p>This simple three line class definition tells us a lot! Let's start at the first line. It starts the definition of the <span class="fixed">Applicative</span> class and it also introduces a class constraint. It says that if we want to make a type constructor part of the <span class="fixed">Applicative</span> typeclass, it has to be in <span class="fixed">Functor</span> first. That's why if we know that if a type constructor is part of the <span class="fixed">Applicative</span> typeclass, it's also in <span class="fixed">Functor</span>, so we can use <span class="fixed">fmap</span> on it.</p>
 <p>The first method it defines is called <span class="fixed">pure</span>. Its type declaration is <span class="fixed">pure :: a -&gt; f a</span>. <span class="fixed">f</span> plays the role of our applicative functor instance here. Because Haskell has a very good type system and because everything a function can do is take some parameters and return some value, we can tell a lot from a type declaration and this is no exception. <span class="fixed">pure</span> should take a value of any type and return an applicative functor with that value inside it. When we say <i>inside it</i>, we're using the box analogy again, even though we've seen that it doesn't always stand up to scrutiny. But the <span class="fixed">a -&gt; f a</span> type declaration is still pretty descriptive. We take a value and we wrap it in an applicative functor that has that value as the result inside it.</p>
 <p>A better way of thinking about <span class="fixed">pure</span> would be to say that it takes a value and puts it in some sort of default (or pure) context&mdash;a minimal context that still yields that value.</p>
-<p>The <span class="fixed">&lt;*&gt;</span> function is really interesting. It has a type declaration of <span class="fixed">f (a -&gt; b) -&gt; f a -&gt; f b</span>. Does this remind you of anything? Of course, <span class="fixed">fmap :: (a -&gt; b) -&gt; f a -&gt; f b</span>. It's a sort of a beefed up <span class="fixed">fmap</span>. Whereas <span class="fixed">fmap</span> takes a function and a functor and applies the function inside the functor, <span class="fixed">&lt;*&gt;</span> takes a functor that has a function in it and another functor and sort of extracts that function from the first functor and then maps it over the second one. When I say <i>extract</i>, I actually sort of mean <i>run</i> and then extract, maybe even <i>sequence</i>. We'll see why soon. 
+<p>The <span class="fixed">&lt;*&gt;</span> function is really interesting. It has a type declaration of <span class="fixed">f (a -&gt; b) -&gt; f a -&gt; f b</span>. Does this remind you of anything? Of course, <span class="fixed">fmap :: (a -&gt; b) -&gt; f a -&gt; f b</span>. It's a sort of a beefed up <span class="fixed">fmap</span>. Whereas <span class="fixed">fmap</span> takes a function and a functor and applies the function inside the functor, <span class="fixed">&lt;*&gt;</span> takes a functor that has a function in it and another functor and sort of extracts that function from the first functor and then maps it over the second one. When I say <i>extract</i>, I actually sort of mean <i>run</i> and then extract, maybe even <i>sequence</i>. We'll see why soon.
 <p>Let's take a look at the <span class="fixed">Applicative</span> instance implementation for <span class="fixed">Maybe</span>.</p>
 <pre name="code" class="haskell:hs">
 instance Applicative Maybe where
@@ -242,7 +253,7 @@ Nothing
 ghci&gt; pure (+) &lt;*&gt; Nothing &lt;*&gt; Just 5
 Nothing
 </pre>
-<img src="images/whale.png" alt="whaale" class="right" width="214" height="177">
+<img src="http://s3.amazonaws.com/lyah/whale.png" alt="whaale" class="right" width="214" height="177">
 <p>What's going on here? Let's take a look, step by step. <span class="fixed">&lt;*&gt;</span> is left-associative, which means that <span class="fixed">pure (+) &lt;*&gt; Just 3 &lt;*&gt; Just 5</span> is the same as <span class="fixed">(pure (+) &lt;*&gt; Just 3) &lt;*&gt; Just 5</span>. First, the <span class="fixed">+</span> function is put in a functor, which is in this case a <span class="fixed">Maybe</span> value that contains the function. So at first, we have <span class="fixed">pure (+)</span>, which is <span class="fixed">Just (+)</span>. Next, <span class="fixed">Just (+) &lt;*&gt; Just 3</span> happens. The result of this is <span class="fixed">Just (3+)</span>. This is because of partial application. Only applying <span class="fixed">3</span> to the <span class="fixed">+</span> function results in a function that takes one parameter and adds 3 to it. Finally, <span class="fixed">Just (3+) &lt;*&gt; Just 5</span> is carried out, which results in a <span class="fixed">Just 8</span>. </p>
 <p>Isn't this awesome?! Applicative functors and the applicative style of doing <span class="fixed">pure f &lt;*&gt; x &lt;*&gt; y &lt;*&gt; ...</span> allow us to take a function that expects parameters that aren't necessarily wrapped in functors and use that function to operate on several values that are in functor contexts. The function can take as many parameters as we want, because it's always partially applied step by step between occurences of <span class="fixed">&lt;*&gt;</span>.</p>
 <p>This becomes even more handy and apparent if we consider the fact that <span class="fixed">pure f &lt;*&gt; x</span> equals <span class="fixed">fmap f x</span>. This is one of the applicative laws. We'll take a closer look at them later, but for now, we can sort of intuitively see that this is so. Think about it, it makes sense. Like we said before, <span class="fixed">pure</span> puts a value in a default context. If we just put a function in a default context and then extract and apply it to a value inside another applicative functor, we did the same as just mapping that function over that applicative functor. Instead of writing <span class="fixed">pure f &lt;*&gt; x &lt;*&gt; y &lt;*&gt; ...</span>, we can write <span class="fixed">fmap f x &lt;*&gt; y &lt;*&gt; ...</span>. This is why <span class="fixed">Control.Applicative</span> exports a function called <span class="fixed">&lt;$&gt;</span>, which is just <span class="fixed">fmap</span> as an infix operator. Here's how it's defined:</p>
@@ -298,8 +309,8 @@ ghci&gt; (++) &lt;$&gt; ["ha","heh","hmm"] &lt;*&gt; ["?","!","."]
 <p>You can view lists as non-deterministic computations. A value like <span class="fixed">100</span> or <span class="fixed">"what"</span> can be viewed as a deterministic computation that has only one result, whereas a list like <span class="fixed">[1,2,3]</span> can be viewed as a computation that can't decide on which result it wants to have, so it presents us with all of the possible results. So when you do something like <span class="fixed">(+) &lt;$&gt; [1,2,3] &lt;*&gt; [4,5,6]</span>, you can think of it as adding together two non-deterministic computations with <span class="fixed">+</span>, only to produce another non-deterministic computation that's even less sure about its result.</p>
 <p>Using the applicative style on lists is often a good replacement for list comprehensions. In the second chapter, we wanted to see all the possible products of <span class="fixed">[2,5,10]</span> and <span class="fixed">[8,10,11]</span>, so we did this:</p>
 <pre name="code" class="haskell:hs">
-ghci&gt; [ x*y | x &lt;- [2,5,10], y &lt;- [8,10,11]]   
-[16,20,22,40,50,55,80,100,110]   
+ghci&gt; [ x*y | x &lt;- [2,5,10], y &lt;- [8,10,11]]
+[16,20,22,40,50,55,80,100,110]
 </pre>
 <p>We're just drawing from two lists and applying a function between every combination of elements. This can be done in the applicative style as well:</p>
 <pre name="code" class="haskell:hs">
@@ -321,7 +332,7 @@ instance Applicative IO where
         x &lt;- b
         return (f x)
 </pre>
-<img src="images/knight.png" alt="ahahahah!" class="left" width="195" height="458">
+<img src="http://s3.amazonaws.com/lyah/knight.png" alt="ahahahah!" class="left" width="195" height="458">
 <p>Since <span class="fixed">pure</span> is all about putting a value in a minimal context that still holds it as its result, it makes sense that <span class="fixed">pure</span> is just <span class="fixed">return</span>, because <span class="fixed">return</span> does exactly that; it makes an I/O action that doesn't do anything, it just yields some value as its result, but it doesn't really do any I/O operations like printing to the terminal or reading from a file.</p>
 <p>If <span class="fixed">&lt;*&gt;</span> were specialized for <span class="fixed">IO</span> it would have a type of <span class="fixed">(&lt;*&gt;) :: IO (a -&gt; b) -&gt; IO a -&gt; IO b</span>. It would take an I/O action that yields a function as its result and another I/O action and create a new I/O action from those two that, when performed, first performs the first one to get the function and then performs the second one to get the value and then it would yield that function applied to the value as its result. We used <i>do</i> syntax to implement it here. Remember, <i>do</i> syntax is about taking several I/O actions and gluing them into one, which is exactly what we do here.</p>
 <p>With <span class="fixed">Maybe</span> and <span class="fixed">[]</span>, we could think of <span class="fixed">&lt;*&gt;</span> as simply extracting a function from its left parameter and then sort of applying it over the right one. With <span class="fixed">IO</span>, extracting is still in the game, but now we also have a notion of <i>sequencing</i>, because we're taking two I/O actions and we're sequencing, or gluing, them into one. We have to extract the function from the first I/O action, but to extract a result from an I/O action, it has to be performed.</p>
@@ -348,7 +359,7 @@ main = do
 </pre>
 <p>If you ever find yourself binding some I/O actions to names and then calling some function on them and presenting that as the result by using <span class="fixed">return</span>, consider using the applicative style because it's arguably a bit more concise and terse.</p>
 <p>Another instance of <span class="fixed">Applicative</span> is <span class="fixed">(-&gt;) r</span>, so functions. They are rarely used with the applicative style outside of code golf, but they're still interesting as applicatives, so let's take a look at how the function instance is implemented.</p>
-<div class="hintbox">If you're confused about what <span class="fixed">(-&gt;) r</span> means, check out the previous section where we explain how <span class="fixed">(-&gt; r)</span> is a functor.</div>
+<div class="hintbox">If you're confused about what <span class="fixed">(-&gt;) r</span> means, check out the previous section where we explain how <span class="fixed">(-&gt;) r</span> is a functor.</div>
 <pre name="code" class="haskell:hs">
 instance Applicative ((-&gt;) r) where
     pure x = (\_ -&gt; x)
@@ -376,7 +387,7 @@ ghci&gt; (+) &lt;$&gt; (+3) &lt;*&gt; (*100) $ 5
 ghci&gt; (\x y z -&gt; [x,y,z]) &lt;$&gt; (+3) &lt;*&gt; (*2) &lt;*&gt; (/2) $ 5
 [8.0,10.0,2.5]
 </pre>
-<img src="images/jazzb.png" alt="SLAP" class="right" width="400px" height="230px">
+<img src="http://s3.amazonaws.com/lyah/jazzb.png" alt="SLAP" class="right" width="400px" height="230px">
 <p>Same here. We create a function that will call the function <span class="fixed">\x y z -&gt; [x,y,z]</span> with the eventual results from <span class="fixed">(+3)</span>, <span class="fixed">(*2)</span> and <span class="fixed">(/2)</span>. The <span class="fixed">5</span> gets fed to each of the three functions and then <span class="fixed">\x y z -&gt; [x, y, z]</span> gets called with those results.</p>
 <p>You can think of functions as boxes that contain their eventual results, so doing <span class="fixed">k &lt;$&gt; f &lt;*&gt; g</span> creates a function that will call <span class="fixed">k</span> with the eventual results from <span class="fixed">f</span> and <span class="fixed">g</span>. When we do something like <span class="fixed">(+) &lt;$&gt; Just 3 &lt;*&gt; Just 5</span>, we're using <span class="fixed">+</span> on values that might or might not be there, which also results in a value that might or might not be there. When we do <span class="fixed">(+) &lt;$&gt; (+10) &lt;*&gt; (+5)</span>, we're using <span class="fixed">+</span> on the future return values of <span class="fixed">(+10)</span> and <span class="fixed">(+5)</span> and the result is also something that will produce a value only when called with a parameter.</p>
 <p>We don't often use functions as applicatives, but this is still really interesting. It's not very important that you get how the <span class="fixed">(-&gt;) r</span> instance for <span class="fixed">Applicative</span> works, so don't despair if you're not getting this right now. Try playing with the applicative style and functions to build up an intuition for functions as applicatives.</p>
@@ -492,6 +503,7 @@ ghci&gt; [[x,y,z] | x &lt;- [1,2], y &lt;- [3,4], z &lt;- [5,6]]
     <li>Now, we evaluate the <span class="fixed">(:) &lt;$&gt; [3,4] &lt;*&gt; [[]]</span> part, which will use <span class="fixed">:</span> with every possible value in the left list (possible values are <span class="fixed">3</span> and <span class="fixed">4</span>) with every possible value on the right list (only possible value is <span class="fixed">[]</span>), which results in <span class="fixed">[3:[], 4:[]]</span>, which is <span class="fixed">[[3],[4]]</span>. So now we have <span class="fixed">(:) &lt;$&gt; [1,2] &lt;*&gt; [[3],[4]]</span></li>
     <li>Now, <span class="fixed">:</span> is used with every possible value from the left list (<span class="fixed">1</span> and <span class="fixed">2</span>) with every possible value in the right list (<span class="fixed">[3]</span> and <span class="fixed">[4]</span>), which results in <span class="fixed">[1:[3], 1:[4], 2:[3], 2:[4]]</span>, which is <span class="fixed">[[1,3],[1,4],[2,3],[2,4]</span></li>
 </ul>
+<p>Doing <span class="fixed">(+) &lt;$&gt; [1,2] &lt;*&gt; [4,5,6]</span>results in a non-deterministic computation <span class="fixed">x + y</span> where <span class="fixed">x</span> takes on every value from <span class="fixed">[1,2]</span> and <span class="fixed">y</span> takes on every value from <span class="fixed">[4,5,6]</span>. We represent that as a list which holds all of the possible results. Similarly, when we do <span class="fixed">sequence [[1,2],[3,4],[5,6],[7,8]]</span>, the result is a non-deterministic computation <span class="fixed">[x,y,z,w]</span>, where <span class="fixed">x</span> takes on every value from <span class="fixed">[1,2]</span>, <span class="fixed">y</span> takes on every value from <span class="fixed">[3,4]</span> and so on. To represent the result of that non-deterministic computation, we use a list, where each element in the list is one possible list. That's why the result is a list of lists.</p>
 <p>When used with I/O actions, <span class="fixed">sequenceA</span> is the same thing as <span class="fixed">sequence</span>! It takes a list of I/O actions and returns an I/O action that will perform each of those actions and have as its result a list of the results of those I/O actions. That's because to turn an <span class="fixed">[IO a]</span> value into an <span class="fixed">IO [a]</span> value, to make an I/O action that yields a list of results when performed, all those I/O actions have to be sequenced so that they're then performed one after the other when evaluation is forced. You can't get the result of an I/O action without performing it.</p>
 <pre name="code" class="haskell:hs">
 ghci&gt; sequenceA [getLine, getLine, getLine]
@@ -509,4 +521,1578 @@ woo
 </ul>
 <p>We won't go over them in detail right now because that would take up a lot of pages and it would probably be kind of boring, but if you're up to the task, you can take a closer look at them and see if they hold for some of the instances.</p>
 <p>In conclusion, applicative functors aren't just interesting, they're also useful, because they allow us to combine different computations, such as I/O computations, non-deterministic computations, computations that might have failed, etc. by using the applicative style. Just by using <span class="fixed">&lt;$&gt;</span> and <span class="fixed">&lt;*&gt;</span> we can use normal functions to uniformly operate on any number of applicative functors and take advantage of the semantics of each one.</p>
-<a name="newtype"></a><h2><?=$contents[$_P[0]]['subchapters']['newtype']?></h2>
+<a name="the-newtype-keyword"></a><h2>The newtype keyword</h2>
+
+<img src="http://s3.amazonaws.com/lyah/maoi.png" alt="why_ so serious?" class="left" width="107" height="202">
+
+<p>
+So far, we've learned how to make our own algebraic data types by using the
+<em>data</em> keyword.  We've also learned how to give existing types
+synonyms with the <em>type</em> keyword. In this section, we'll be taking a look
+at how to make new types out of existing data types by using the
+<em>newtype</em> keyword and why we'd want to do that in the first place.
+</p>
+
+<p>
+In the previous section, we saw that there are actually more ways for the list
+type to be an applicative functor. One way is to have <span class="fixed">&lt;*&gt;</span>
+take every function out of the list that is its left parameter and apply it to
+every value in the list that is on the right, resulting in every possible
+combination of applying a function from the left list to a value in the right
+list.
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; [(+1),(*100),(*5)] <*> [1,2,3]
+[2,3,4,100,200,300,5,10,15]
+</pre>
+
+<p>
+The second way is to take the first function on the left side of
+<span class="fixed">&lt;*&gt;</span> and apply it to the first value on the
+right, then take the second function from the list on the left side and apply it
+to the second value on the right, and so on. Ultimately, it's kind of like
+zipping the two lists together. But lists are already an instance of
+<span class="fixed">Applicative</span>, so how did we also make lists an instance
+of <span class="fixed">Applicative</span> in this second way? If you remember,
+we said that the <span class="fixed">ZipList a</span> type was introduced for
+this reason, which has one value constructor, <span class="fixed">ZipList</span>,
+that has just one field. We put the list that we're wrapping in that field.
+Then, <span class="fixed">ZipList</span> was made an instance of <span class="fixed">Applicative</span>,
+so that when we want to use lists as applicatives in the zipping manner, we just
+wrap them with the <span class="fixed">ZipList</span> constructor and then once
+we're done, unwrap them with <span class="fixed">getZipList</span>:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; getZipList $ ZipList [(+1),(*100),(*5)] <*> ZipList [1,2,3]
+[2,200,15]
+</pre>
+
+<p>
+So, what does this have to do with this <i>newtype</i> keyword? Well, think
+about how we might write the data declaration for our <span
+class="fixed">ZipList a</span> type. One way would be to do it like so:
+</p>
+
+<pre name="code" class="haskell:hs">
+data ZipList a = ZipList [a]
+</pre>
+
+<p>
+A type that has just one value constructor and that value constructor has
+just one field that is a list of things. We might also want to use record syntax
+so that we automatically get a function that extracts a list from a <span class="fixed">ZipList</span>:
+</p>
+
+<pre name="code" class="haskell:hs">
+data ZipList a = ZipList { getZipList :: [a] }
+</pre>
+
+<p>
+This looks fine and would actually work pretty well. We had two ways of making
+an existing type an instance of a type class, so we used the <i>data</i>
+keyword to just wrap that type into another type and made the other type an
+instance in the second way.
+</p>
+
+<p>
+The <i>newtype</i> keyword in Haskell is made exactly for
+these cases when we want to just take one type and wrap it in something to
+present it as another type. In the actual libraries, <span class="fixed">ZipList
+a</span> is defined like this:
+</p>
+
+<pre name="code" class="haskell:hs">
+newtype ZipList a = ZipList { getZipList :: [a] }
+</pre>
+
+<p>
+Instead of the <i>data</i> keyword, the <i>newtype</i> keyword is used. Now why is that? Well for one,
+<i>newtype</i> is faster. If you use the <i>data</i> keyword
+to wrap a type, there's some overhead to all that wrapping and unwrapping when
+your program is running. But if you use <i>newtype</i>, Haskell knows that
+you're just using it to wrap an existing type into a new type (hence the name),
+because you want it to be the same internally but have a different type. With
+that in mind, Haskell can get rid of the wrapping and unwrapping once it
+resolves which value is of what type.
+</p>
+
+<p>
+So why not just use <i>newtype</i> all the time instead of <i>data</i> then?
+Well, when you make a new type from an existing type by using the
+<i>newtype</i> keyword, you can only have one value constructor and that value
+constructor can only have one field. But with <i>data</i>, you can make data
+types that have several value constructors and each constructor can have zero or
+more fields:
+</p>
+
+<pre name="code" class="haskell:hs">
+data Profession = Fighter | Archer | Accountant
+
+data Race = Human | Elf | Orc | Goblin
+
+data PlayerCharacter = PlayerCharacter Race Profession
+</pre>
+
+<p>
+When using <i>newtype</i>, you're restricted to just one constructor with one
+field.
+</p>
+
+<p>
+We can also use the <i>deriving</i> keyword with <i>newtype</i> just like we
+would with <i>data</i>. We can derive instances for
+<span class="fixed">Eq</span>,
+<span class="fixed">Ord</span>,
+<span class="fixed">Enum</span>,
+<span class="fixed">Bounded</span>,
+<span class="fixed">Show</span> and
+<span class="fixed">Read</span>.
+If we derive the instance for a type class, the type that we're wrapping
+has to be in that type class to begin with. It makes sense, because
+<i>newtype</i> just wraps an existing type. So now if we do the following, we
+can print and equate values of our new type:
+</p>
+
+<pre name="code" class="haskell:hs">
+newtype CharList = CharList { getCharList :: [Char] } deriving (Eq, Show)
+</pre>
+
+<p>
+Let's give that a go:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; CharList "this will be shown!"
+CharList {getCharList = "this will be shown!"}
+ghci&gt; CharList "benny" == CharList "benny"
+True
+ghci&gt; CharList "benny" == CharList "oisters"
+False
+</pre>
+
+<p>
+In this particular <i>newtype</i>, the value constructor has the following type:
+</p>
+
+<pre name="code" class="haskell:hs">
+CharList :: [Char] -&gt; CharList
+</pre>
+
+<p>
+It takes a <span class="fixed">[Char]</span> value, such as <span
+class="fixed">"my sharona"</span>
+and returns a <span
+class="fixed">CharList</span> value. From the above examples where we used
+the <span class="fixed">CharList</span> value constructor, we see that really is
+the case. Conversely, the <span class="fixed">getCharList</span> function, which
+was generated for us because we used record syntax in our <i>newtype</i>, has
+this type:
+</p>
+
+<pre name="code" class="haskell:hs">
+getCharList :: CharList -&gt; [Char]
+</pre>
+
+<p>
+It takes a <span class="fixed">CharList</span> value and converts it to a
+<span class="fixed">[Char]</span> value. You can think of this as wrapping
+and unwrapping, but you can also think of it as converting values from one type
+to the other.
+</p>
+
+<h3>Using newtype to make type class instances</h3>
+
+<p>
+Many times, we want to make our types instances of certain type classes, but the
+type parameters just don't match up for what we want to do. It's easy to make
+<span class="fixed">Maybe</span> an instance of <span class="fixed">Functor</span>, because
+the <span class="fixed">Functor</span> type class is defined like this:
+</p>
+
+<pre name="code" class="haskell:hs">
+class Functor f where
+    fmap :: (a -&gt; b) -&gt; f a -&gt; f b
+</pre>
+
+<p>So we just start out with:</p>
+
+<pre name="code" class="haskell:hs">
+instance Functor Maybe where
+</pre>
+
+<p>
+And then implement <span class="fixed">fmap</span>. All the type parameters add
+up because the <span class="fixed">Maybe</span> takes the place of <span class="fixed">f</span>
+in the definition of the <span class="fixed">Functor</span> type class and so if
+we look at <span class="fixed">fmap</span> like it only worked on
+<span class="fixed">Maybe</span>, it ends up behaving like:
+</p>
+
+<pre name="code" class="haskell:hs">
+fmap :: (a -&gt; b) -&gt; Maybe a -&gt; Maybe b
+</pre>
+
+<img src="http://s3.amazonaws.com/lyah/krakatoa.png" alt="wow, very evil" class="right" width="322px" height="280px">
+
+<p>
+Isn't that just peachy? Now what if we wanted to make the tuple an instance of
+<span class="fixed">Functor</span> in such a way that when we <span class="fixed">fmap</span>
+a function over a tuple, it gets applied to the first component of the tuple?
+That way, doing <span class="fixed">fmap (+3) (1,1)</span> would result in <span class="fixed">(4,1)</span>.
+It turns out that writing the instance for that is kind of hard. With <span
+class="fixed">Maybe</span>, we just say <span class="fixed">instance Functor
+Maybe where</span> because only type constructors that take exactly one
+parameter can be made an instance of <span class="fixed">Functor</span>. But it
+seems like there's
+no way to do something like that with <span class="fixed">(a,b)</span> so that
+the type parameter <span class="fixed">a</span> ends up being the one that
+changes when we use <span class="fixed">fmap</span>. To get  around this, we
+can <i>newtype</i> our tuple in such a way that the second type parameter
+represents the type of the first component in the tuple:
+</p>
+
+<pre name="code" class="haskell:hs">
+newtype Pair b a = Pair { getPair :: (a,b) }
+</pre>
+
+<p>
+And now, we can make it an instance of <span class="fixed">Functor</span> so
+that the function is mapped over the first component:
+</p>
+
+<pre name="code" class="haskell:hs">
+instance Functor (Pair c) where
+    fmap f (Pair (x,y)) = Pair (f x, y)
+</pre>
+
+<p>
+As you can see, we can pattern match on types defined with <i>newtype</i>. We
+pattern match to get the underlying tuple, then we apply the function <span class="fixed">f</span>
+to the first component in the tuple and then we use the <span class="fixed">Pair</span>
+value constructor to convert the tuple back to our <span class="fixed">Pair b a</span>.
+If we imagine what the type <span class="fixed">fmap</span> would be if it only
+worked on our new pairs, it would be:
+</p>
+
+<pre name="code" class="haskell:hs">
+fmap :: (a -&gt; b) -&gt; Pair c a -&gt; Pair c b
+</pre>
+
+<p>
+Again, we said <span class="fixed">instance Functor (Pair c) where</span> and so
+<span class="fixed">Pair c</span> took the place of the <span class="fixed">f</span>
+in the type class definition for <span class="fixed">Functor</span>:
+</p>
+
+<pre name="code" class="haskell:hs">
+class Functor f where
+    fmap :: (a -&gt; b) -&gt; f a -&gt; f b
+</pre>
+
+<p>
+So now, if we convert a tuple into a <span class="fixed">Pair b a</span>, we can
+use <span class="fixed">fmap</span> over it and the function will be mapped over
+the first component:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; getPair $ fmap (*100) (Pair (2,3))
+(200,3)
+ghci&gt; getPair $ fmap reverse (Pair ("london calling", 3))
+("gnillac nodnol",3)
+</pre>
+
+<h3>On newtype laziness</h3>
+
+<p>
+We mentioned that <i>newtype</i> is usually faster than <i>data</i>. The
+only thing that can be done with <i>newtype</i> is turning an existing type
+into a new type, so internally, Haskell can represent the values of types
+defined with <i>newtype</i> just like the original ones, only it has to keep in
+mind that the their types are now distinct. This fact means that not only is
+<i>newtype</i> faster, it's also lazier. Let's take a look at what this means.
+</p>
+
+<p>
+Like we've said before, Haskell is lazy by default, which means that only
+when we try to actually print the results of our functions will any computation
+take place. Furthemore, only those computations that are necessary for our
+function to tell us the result will get carried out. The <span class="fixed">undefined</span>
+value in Haskell represents an erronous computation. If we try to evaluate it
+(that is, force Haskell to actually compute it) by printing it to
+the terminal, Haskell will throw a hissy fit (technically referred to as an
+exception):
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; undefined
+*** Exception: Prelude.undefined
+</pre>
+
+<p>
+However, if we make a list that has some <span class="fixed">undefined</span>
+values in it but request only the head of the list, which is not <span class="fixed">undefined</span>,
+everything will go smoothly because Haskell doesn't really need to evaluate any
+other elements in a list if we only want to see what the first element is:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; head [3,4,5,undefined,2,undefined]
+3
+</pre>
+
+<p>
+Now consider the following type:
+</p>
+
+<pre name="code" class="haskell:hs">
+data CoolBool = CoolBool { getCoolBool :: Bool }
+</pre>
+
+<p>
+It's your run-of-the-mill algebraic data type that was defined with the
+<i>data</i> keyword. It has one value constructor, which has one field whose
+type is <span class="fixed">Bool</span>. Let's make a function that pattern
+matches on a <span class="fixed">CoolBool</span> and returns the value
+<span class="fixed">"hello"</span> regardless of whether the <span class="fixed">Bool</span> inside
+the <span class="fixed">CoolBool</span> was <span class="fixed">True</span> or
+<span class="fixed">False</span>:
+</p>
+
+<pre name="code" class="haskell:hs">
+helloMe :: CoolBool -&gt; String
+helloMe (CoolBool _) = "hello"
+</pre>
+
+<p>
+Instead of applying this function to a normal <span class="fixed">CoolBool</span>,
+let's throw it a curveball and apply it to <span class="fixed">undefined</span>!
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; helloMe undefined
+"*** Exception: Prelude.undefined
+</pre>
+
+<p>
+Yikes! An exception! Now why did this exception happen? Types defined with
+the <i>data</i> keyword can have multiple value constructors (even though
+<span class="fixed">CoolBool</span> only has one). So in order to see if the
+value given to our function conforms to the <span class="fixed">(CoolBool _)</span>
+pattern, Haskell has to evaluate the value just enough to see which value
+constructor was used when we made the value. And when we try to evaluate an
+<span class="fixed">undefined</span> value, even a little, an exception is
+thrown.
+</p>
+
+<p>
+Instead of using the <i>data</i> keyword for <span class="fixed">CoolBool</span>,
+let's try using <i>newtype</i>:
+</p>
+
+<pre name="code" class="haskell:hs">
+newtype CoolBool = CoolBool { getCoolBool :: Bool }
+</pre>
+
+<p>
+We don't have to change our <span class="fixed">helloMe</span> function, because
+the pattern matching syntax is the same if you use <i>newtype</i> or
+<i>data</i> to define your type. Let's do the same thing here and apply
+<span class="fixed">helloMe</span> to an <span class="fixed">undefined</span>
+value:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; helloMe undefined
+"hello"
+</pre>
+
+<img src="http://s3.amazonaws.com/lyah/shamrock.png" alt="top of the mornin to ya!!!" class="right" width="184" height="230">
+
+<p>
+It worked! Hmmm, why is that? Well, like we've said, when we use <i>newtype</i>,
+Haskell can internally represent the values of the new type in the same way as the original
+values. It doesn't have to add another box around them, it just has to be aware
+of the values being of different types. And because Haskell knows that types
+made with the <i>newtype</i> keyword can only have one constructor, it doesn't
+have to evaluate the value passed to the function to make sure that it conforms
+to the <span class="fixed">(CoolBool _)</span> pattern because <i>newtype</i>
+types can only have one possible value constructor and one field!
+</p>
+
+<p>
+This difference in behavior may seem trivial, but it's actually pretty
+important because it helps us realize that even though types defined with
+<i>data</i> and <i>newtype</i> behave similarly from the programmer's point of
+view because they both have value constructors and fields, they are actually two
+different mechanisms. Whereas <i>data</i> can be used to make your own types
+from scratch, <i>newtype</i> is for making a completely new type out of an
+existing type. Pattern matching on <i>newtype</i> values isn't like taking
+something out of a box (like it is with <i>data</i>), it's more about making a
+direct conversion from one type to another.
+</p>
+
+<h3><span class="fixed">type</span> vs. <span class="fixed">newtype</span> vs. <span class="fixed">data</span></h3>
+
+<p>
+At this point, you may be a bit confused about what exactly the difference
+between <i>type</i>, <i>data</i> and <i>newtype</i> is, so let's refresh our
+memory a bit.
+</p>
+
+<p>
+The <em>type</em> keyword is for making type synonyms. What that means is that
+we just give another name to an already existing type so that the type is easier
+to refer to. Say we did the following:
+</p>
+
+<pre name="code" class="haskell:hs">
+type IntList = [Int]
+</pre>
+
+<p>
+All this does is to allow us to refer to the <span class="fixed">[Int]</span>
+type as <span class="fixed">IntList</span>. They can be used interchangeably.
+We don't get an <span class="fixed">IntList</span> value constructor or anything like that.
+Because <span class="fixed">[Int]</span> and <span class="fixed">IntList</span>
+are only two ways to refer to the same type, it doesn't matter which name we use
+in our type annotations:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; ([1,2,3] :: IntList) ++ ([1,2,3] :: [Int])
+[1,2,3,1,2,3]
+</pre>
+
+<p>
+We use type synonyms when we want to make our type signatures more
+descriptive by giving types names that tell us something about their purpose in
+the context of the functions where they're being used. For instance, when we
+used an association list of type <span class="fixed">[(String,String)]</span> to
+represent a phone book, we gave it the type synonym of
+<span class="fixed">PhoneBook</span> so that the type signatures of our
+functions were easier to read.
+</p>
+
+<p>
+The <em>newtype</em> keyword is for taking existing types and wrapping them in
+new types, mostly so that it's easier to make them instances of certain type
+classes. When we use <i>newtype</i> to wrap an existing type, the type that we
+get is separate from the original type. If we make the following <i>newtype</i>:
+</p>
+
+<pre name="code" class="haskell:hs">
+newtype CharList = CharList { getCharList :: [Char] }
+</pre>
+
+<p>
+We can't use <span class="fixed">++</span> to put together a
+<span class="fixed">CharList</span> and a list of type
+<span class="fixed">[Char]</span>. We can't even use
+<span class="fixed">++</span> to put together two <span class="fixed">CharList</span>s,
+because <span class="fixed">++</span> works only on lists and the
+<span class="fixed">CharList</span> type isn't a list, even though it could be
+said that it contains one. We can, however, convert two <span class="fixed">CharList</span>s to
+lists, <span class="fixed">++</span> them and then convert that back to a <span class="fixed">CharList</span>.
+</p>
+
+<p>
+When we use record syntax in our <i>newtype</i> declarations, we get functions
+for converting between the new type and the original type: namely the value
+constructor of our <i>newtype</i> and the function for extracting the value
+in its field. The new type also isn't automatically made an instance of the
+type classes that the original type belongs to, so we have to derive or
+manually write them.
+</p>
+
+<p>
+In practice, you can think of <i>newtype</i> declarations as <i>data</i> declarations
+that can only have one constructor and one field. If you catch yourself writing
+such a <i>data</i> declaration, consider using <i>newtype</i>.
+</p>
+
+<p>
+The <em>data</em> keyword is for making your own data types and with them, you
+can go hog wild. They can have as many constructors and fields as you wish and
+can be used to implement any algebraic data type by yourself. Everything from
+lists and <span class="fixed">Maybe</span>-like types to trees.
+</p>
+
+<p>
+If you just want your type signatures to look cleaner and be more
+descriptive, you probably want type synonyms. If you want to take an existing
+type and wrap it in a new type in order to make it an instance of a type class,
+chances are you're looking for a <i>newtype</i>. And if you want to make
+something completely new, odds are good that you're looking for the <i>data</i>
+keyword.
+</p>
+
+<a name="monoids"></a><h2>Monoids</h2>
+
+<img src="http://s3.amazonaws.com/lyah/pirateship.png" alt="wow this is pretty much the gayest pirate ship
+ever" class="right" width="460" height="417">
+
+<p>
+Type classes in Haskell are used to present an interface for types that have
+some behavior in common. We started out with simple type classes like <span
+class="fixed">Eq</span>, which is for types whose values can be equated, and
+<span class="fixed">Ord</span>, which is for things that can be put in an order
+and then moved on to more interesting ones, like <span
+class="fixed">Functor</span> and <span class="fixed">Applicative</span>.
+
+<p>
+When we make a type, we think about which behaviors it supports, i.e. what it can
+act like and then based on that we decide which type classes to make it an
+instance of. If it makes sense for values of our type to be equated, we make it
+an instance of the <span class="fixed">Eq</span> type class. If we see that our
+type is some kind of functor, we make it an instance of
+<span class="fixed">Functor</span>, and so on.
+</p>
+
+<p>
+Now consider the following: <span class="fixed">*</span> is a function that
+takes two numbers and multiplies them. If we multiply some number with a <span
+class="fixed">1</span>, the result is always equal to that number. It doesn't
+matter if we do <span class="fixed">1 * x</span> or <span class="fixed">x *
+1</span>, the result is always <span class="fixed">x</span>. Similarly, <span
+class="fixed">++</span> is
+also a function which takes two things and returns a third. Only instead of
+multiplying numbers, it takes two lists and concatenates them. And much like
+<span class="fixed">*</span>, it also has a certain value which doesn't change
+the other one when used with <span class="fixed">++</span>. That value is the
+empty list: <span class="fixed">[]</span>.
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; 4 * 1
+4
+ghci&gt; 1 * 9
+9
+ghci&gt; [1,2,3] ++ []
+[1,2,3]
+ghci&gt; [] ++ [0.5, 2.5]
+[0.5,2.5]
+</pre>
+
+<p>
+It seems that both <span class="fixed">*</span> together with <span
+class="fixed">1</span>
+and <span class="fixed">++</span> along with <span class="fixed">[]</span> share
+some common properties:
+</p>
+
+<ul>
+    <li>The function takes two parameters.</li>
+    <li>The parameters and the returned value have the same type.</li>
+    <li>There exists such a value that doesn't change other values when used
+    with the binary function.</li>
+</ul>
+
+<p>
+There's another thing that these two operations have in common that may not be
+as obvious as our previous observations: when we have three or more values and
+we want to use the binary function to reduce them to a single result, the order
+in which we apply the binary function to the values doesn't matter. It doesn't
+matter if we do <span class="fixed">(3 * 4) * 5</span> or <span class="fixed">3
+* (4 * 5)</span>. Either way, the result is <span class="fixed">60</span>. The
+same goes for <span class="fixed">++</span>:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; (3 * 2) * (8 * 5)
+240
+ghci&gt; 3 * (2 * (8 * 5))
+240
+ghci&gt; "la" ++ ("di" ++ "da")
+"ladida"
+ghci&gt; ("la" ++ "di") ++ "da"
+"ladida"
+</pre>
+
+<p>
+We call this property <i>associativity</i>. <span class="fixed">*</span> is
+associative, and so is <span class="fixed">++</span>, but
+<span class="fixed">-</span>, for example, is not. The expressions
+<span class="fixed">(5 - 3) - 4</span> and <span class="fixed">5 - (3 - 4)</span>
+result in different numbers.
+</p>
+
+<p>
+By noticing and writing down these properties, we have chanced upon
+<i>monoids</i>! A monoid
+is when you have an associative binary function and a value which acts as an
+identity with respect to that function. When something acts as an identity with
+respect to a function, it means that when called with that function and some
+other value, the result is always equal to that other value. <span
+class="fixed">1</span>
+is the identity with respect to <span class="fixed">*</span> and <span
+class="fixed">[]</span> is the identity with respect to <span
+class="fixed">++</span>. There are a lot of other monoids to be found in the
+world of Haskell, which is why the <span class="fixed">Monoid</span> type class
+exists. It's for types which can act like monoids. Let's see how the type class
+is defined:
+</p>
+
+<pre name="code" class="haskell:hs">
+class Monoid m where
+    mempty :: m
+    mappend :: m -&gt; m -&gt; m
+    mconcat :: [m] -&gt; m
+    mconcat = foldr mappend mempty
+</pre>
+
+<img src="http://s3.amazonaws.com/lyah/balloondog.png" alt="woof dee do!!!" class="right" width="260"
+height="326">
+
+<p>
+The <span class="fixed">Monoid</span> type class is defined in
+<span class="fixed">import Data.Monoid</span>. Let's take some time and get
+properly acquainted with it.
+</p>
+
+<p>
+First of all, we see that only concrete types can be made instances of
+<span class="fixed">Monoid</span>, because the <span class="fixed">m</span> in
+the type class definition doesn't take any type parameters. This is different
+from <span class="fixed">Functor</span> and <span class="fixed">Applicative</span>,
+which require their instances to be type constructors which take one parameter.
+</p>
+
+<p>
+The first function is <span class="fixed">mempty</span>. It's not really a
+function, since it doesn't take parameters, so it's a polymorphic constant, kind
+of like <span class="fixed">minBound</span> from <span
+class="fixed">Bounded</span>.  <span class="fixed">mempty</span> represents the
+identity value for a particular monoid.
+</p>
+
+<p>
+Next up, we have <span class="fixed">mappend</span>, which, as you've probably
+guessed, is the binary function. It takes two values of the same type and
+returns a value of that type as well. It's worth noting that the decision to
+name
+<span class="fixed">mappend</span> as it's named was kind of unfortunate,
+because it implies that we're appending two things in some way. While <span
+class="fixed">++</span> does take two lists and append one to the other, <span
+class="fixed">*</span> doesn't really do any appending, it just multiplies two
+numbers together. When we meet other instances of <span
+class="fixed">Monoid</span>, we'll see that most of them don't append values
+either, so avoid thinking in terms of appending and just think in terms of
+<span class="fixed">mappend</span> being a binary function that takes two monoid
+values and returns a third.
+</p>
+
+<p>
+The last function in this type class definition is <span class="fixed">mconcat</span>.
+It takes a list of monoid values and reduces them to a single value by doing
+<span class="fixed">mappend</span> between the list's elements. It has a default
+implementation, which just takes <span class="fixed">mempty</span> as a starting
+value and folds the list from the right with <span class="fixed">mappend</span>.
+Because the default implementation is fine for most instances, we won't concern
+ourselves with <span class="fixed">mconcat</span> too much from now on. When
+making a type an instance of <span class="fixed">Monoid</span>, it suffices to
+just implement <span class="fixed">mempty</span> and <span class="fixed">mappend</span>.
+The reason <span class="fixed">mconcat</span> is there at all is because for
+some instances, there might be a more efficient way to implement
+<span class="fixed">mconcat</span>, but for most instances the default
+implementation is just fine.
+</p>
+
+<p>
+Before moving on to specific instances of <span class="fixed">Monoid</span>,
+let's take a brief look at the monoid laws. We mentioned that there has to be a
+value that acts as the identity with respect to the binary function and that the
+binary function has to be associative. It's possible to make instances of
+<span class="fixed">Monoid</span> that don't follow these rules, but such instances
+are of no use to anyone because when using the <span class="fixed">Monoid</span>
+type class, we rely on its instances acting like monoids. Otherwise, what's the
+point? That's why when making instances, we have to make sure they follow these
+laws:
+</p>
+
+<ul>
+    <li><span class="label law">mempty `mappend` x = x</span></li>
+    <li><span class="label law">x `mappend` mempty = x</span></li>
+    <li><span class="label law">(x `mappend` y) `mappend` z = x `mappend` (y
+    `mappend` z)</span></li>
+</ul>
+
+<p>
+The first two state that <span class="fixed">mempty</span> has to act as the
+identity with respect to <span class="fixed">mappend</span> and the third says
+that <span class="fixed">mappend</span> has to be associative i.e. that it the
+order in which we use <span class="fixed">mappend</span> to reduce several
+monoid values into one doesn't matter. Haskell doesn't enforce these laws, so we
+as the programmer have to be careful that our instances do indeed obey them.
+</p>
+
+<h3>Lists are monoids</h3>
+
+<p>
+Yes, lists are monoids! Like we've seen, the <span class="fixed">++</span>
+function and the empty list <span class="fixed">[]</span> form a monoid. The
+instance is very simple:
+</p>
+
+<pre name="code" class="haskell:hs">
+instance Monoid [a] where
+    mempty = []
+    mappend = (++)
+</pre>
+
+<p>
+Lists are an instance of the <span class="fixed">Monoid</span> type class
+regardless of the type of the elements they hold.
+Notice that we wrote <span class="fixed">instance Monoid [a]</span> and not
+<span class="fixed">instance Monoid []</span>, because <span
+class="fixed">Monoid</span>
+requires a concrete type for an instance.
+</p>
+
+<p>
+Giving this a test run, we encounter no surprises:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; [1,2,3] `mappend` [4,5,6]
+[1,2,3,4,5,6]
+ghci&gt; ("one" `mappend` "two") `mappend` "tree"
+"onetwotree"
+ghci&gt; "one" `mappend` ("two" `mappend` "tree")
+"onetwotree"
+ghci&gt; "one" `mappend` "two" `mappend` "tree"
+"onetwotree"
+ghci&gt; "pang" `mappend` mempty
+"pang"
+ghci&gt; mconcat [[1,2],[3,6],[9]]
+[1,2,3,6,9]
+ghci&gt; mempty :: [a]
+[]
+</pre>
+
+<img src="http://s3.amazonaws.com/lyah/smug.png" alt="smug as hell" class="left" width="157" height="144">
+
+<p>
+Notice that in the last line, we had to write an explicit type annotation,
+because if we just did <span class="fixed">mempty</span>, GHCi wouldn't know
+which instance to use, so we had to say we want the list instance. We were able
+to use the general type of <span class="fixed">[a]</span> (as opposed to
+specifying <span class="fixed">[Int]</span> or <span class="fixed">[String]</span>)
+because the empty list can act as if it contains any type.
+</p>
+
+<p>
+Because <span class="fixed">mconcat</span> has a default implementation, we get
+it for free when we make something an instance of <span class="fixed">Monoid</span>.
+In the case of the list, <span class="fixed">mconcat</span> turns out to be just
+<span class="fixed">concat</span>. It takes a list of lists and flattens it,
+because that's the equivalent of doing <span class="fixed">++</span> between all
+the adjecent lists in a list.
+</p>
+
+<p>
+The monoid laws do indeed hold for the list instance. When we have several lists
+and we <span class="fixed">mappend</span> (or <span class="fixed">++</span>)
+them together, it doesn't matter which ones we do first, because they're just
+joined at the ends anyway. Also, the empty list acts as the identity so all is well.
+Notice that monoids don't require that <span class="fixed">a `mappend` b</span>
+be equal to <span class="fixed">b `mappend` a</span>. In the case of the list,
+they clearly aren't:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; "one" `mappend` "two"
+"onetwo"
+ghci&gt; "two" `mappend` "one"
+"twoone"
+</pre>
+
+<p>
+And that's okay. The fact that for multiplication <span class="fixed">3 * 5</span> and
+<span class="fixed">5 * 3</span> are the same is just a property of
+multiplication, but it doesn't hold for all (and indeed, most) monoids.
+</p>
+
+<h3><span class="fixed">Product</span> and <span class="fixed">Sum</span></h3>
+
+<p>
+We already examined one way for numbers to be considered monoids. Just have the
+binary function be <span class="fixed">*</span> and the identity value
+<span class="fixed">1</span>. It turns out that that's not the only way for
+numbers to be monoids. Another way is to have the binary function be
+<span class="fixed">+</span> and the identity value <span class="fixed">0</span>:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; 0 + 4
+4
+ghci&gt; 5 + 0
+5
+ghci&gt; (1 + 3) + 5
+9
+ghci&gt; 1 + (3 + 5)
+9
+</pre>
+
+<p>
+The monoid laws hold, because if you add 0 to any number, the result is that
+number. And addition is also associative, so we get no problems there. So now
+that there are two equally valid ways for numbers to be monoids, which way do
+choose? Well, we don't have to. Remember, when there are several ways for some
+type to be an instance of the same type class, we can wrap that type in a
+<i>newtype</i> and then make the new type an instance of the
+type class in a different way. We can have our cake and eat it too.
+</p>
+
+<p>
+The <span class="fixed">Data.Monoid</span> module exports two types for this,
+namely <span class="fixed">Product</span> and <span class="fixed">Sum</span>.
+<span class="fixed">Product</span> is defined like this:
+</p>
+
+<pre name="code" class="haskell:hs">
+newtype Product a =  Product { getProduct :: a }
+    deriving (Eq, Ord, Read, Show, Bounded)
+</pre>
+
+<p>
+Simple, just a <i>newtype</i> wrapper with one type parameter along with some
+derived instances. Its instance for <span class="fixed">Monoid</span> goes a
+little something like this:
+</p>
+
+<pre name="code" class="haskell:hs">
+instance Num a =&gt; Monoid (Product a) where
+    mempty = Product 1
+    Product x `mappend` Product y = Product (x * y)
+</pre>
+
+<p>
+<span class="fixed">mempty</span> is just <span class="fixed">1</span> wrapped
+in a <span class="fixed">Product</span> constructor. <span class="fixed">mappend</span>
+pattern matches on the <span class="fixed">Product</span> constructor,
+multiplies the two numbers and then wraps the resulting number back. As you can
+see, there's a <span class="fixed">Num a</span> class constraint. So this means that
+<span class="fixed">Product a</span> is an instance of <span class="fixed">Monoid</span> for all
+<span class="fixed">a</span>'s that are already an instance of <span class="fixed">Num</span>.
+To use <span class="fixed">Producta a</span> as a monoid, we have to do some
+<i>newtype</i> wrapping and unwrapping:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; getProduct $ Product 3 `mappend` Product 9
+27
+ghci&gt; getProduct $ Product 3 `mappend` mempty
+3
+ghci&gt; getProduct $ Product 3 `mappend` Product 4 `mappend` Product 2
+24
+ghci&gt; getProduct . mconcat . map Product $ [3,4,2]
+24
+</pre>
+
+<p>
+This is nice as a showcase of the <span class="fixed">Monoid</span> type class,
+but no one in their right mind would use this way of multiplying numbers instead
+of just writing <span class="fixed">3 * 9</span> and <span class="fixed">3 * 1</span>.
+But a bit later, we'll see how these <span class="fixed">Monoid</span> instances
+that may seem trivial at this time can come in handy.
+</p>
+
+<p>
+<span class="fixed">Sum</span> is defined like <span class="fixed">Product</span> and the
+instance is similar as well. We use it in the same way:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; getSum $ Sum 2 `mappend` Sum 9
+11
+ghci&gt; getSum $ mempty `mappend` Sum 3
+3
+ghci&gt; getSum . mconcat . map Sum $ [1,2,3]
+6
+</pre>
+
+<h3><span class="fixed">Any</span> and <span class="fixed">All</span></h3>
+
+<p>
+Another type which can act like a monoid in two distinct but equally valid ways
+is <span class="fixed">Bool</span>. The first way is to have the <i>or</i>
+function <span class="fixed">||</span> act as the binary function along with
+<span class="fixed">False</span> as the identity value. The way <i>or</i> works
+in logic is that if any of its two parameters is <span class="fixed">True</span>,
+it returns <span class="fixed">True</span>, otherwise it returns
+<span class="fixed">False</span>. So if we use <span class="fixed">False</span>
+as the identity value, it will return <span class="fixed">False</span> when
+<i>or</i>-ed with <span class="fixed">False</span> and <span class="fixed">True</span>
+when <i>or</i>-ed with <span class="fixed">True</span>. The <span class="fixed">Any</span>
+<i>newtype</i> constructor is an instance of <span class="fixed">Monoid</span>
+in this fashion. It's defined like this:
+</p>
+
+<pre name="code" class="haskell:hs">
+newtype Any = Any { getAny :: Bool }
+    deriving (Eq, Ord, Read, Show, Bounded)
+</pre>
+
+<p>
+Its instance looks goes like so:
+</p>
+
+<pre name="code" class="haskell:hs">
+instance Monoid Any where
+        mempty = Any False
+        Any x `mappend` Any y = Any (x || y)
+</pre>
+
+<p>
+The reason it's called <span class="fixed">Any</span> is because
+<span class="fixed">x `mappend` y</span> will be <span class="fixed">True</span>
+if <i>any</i> one of those two is <span class="fixed">True</span>. Even
+if three or more <span class="fixed">Any</span> wrapped <span class="fixed">Bool</span>s
+are <span class="fixed">mappend</span>ed together, the result will hold
+<span class="fixed">True</span> if any of them are <span class="fixed">True</span>:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; getAny $ Any True `mappend` Any False
+True
+ghci&gt; getAny $ mempty `mappend` Any True
+True
+ghci&gt; getAny . mconcat . map Any $ [False, False, False, True]
+True
+ghci&gt; getAny $ mempty `mappend` mempty
+False
+</pre>
+
+<p>
+The other way for <span class="fixed">Bool</span> to be an instance of
+<span class="fixed">Monoid</span> is to kind of do the opposite: have <span class="fixed">&&</span>
+be the binary function and then make <span class="fixed">True</span>
+the identity value. Logical <i>and</i> will return <span class="fixed">True</span> only
+if both of its parameters are <span class="fixed">True</span>. This is the <i>newtype</i>
+declaration, nothing fancy:
+</p>
+
+<pre name="code" class="haskell:hs">
+newtype All = All { getAll :: Bool }
+        deriving (Eq, Ord, Read, Show, Bounded)
+</pre>
+
+<p>
+And this is the instance:
+</p>
+
+<pre name="code" class="haskell:hs">
+instance Monoid All where
+        mempty = All True
+        All x `mappend` All y = All (x && y)
+</pre>
+
+<p>
+When we <span class="fixed">mappend</span> values of the
+<span class="fixed">All</span> type, the result will be
+<span class="fixed">True</span> only if <i>all</i> the values
+used in the <span class="fixed">mappend</span> operations are
+<span class="fixed">True</span>:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; getAll $ mempty `mappend` All True
+True
+ghci&gt; getAll $ mempty `mappend` All False
+False
+ghci&gt; getAll . mconcat . map All $ [True, True, True]
+True
+ghci&gt; getAll . mconcat . map All $ [True, True, False]
+False
+</pre>
+
+<p>
+Just like with multiplication and addition, we usually explicitly state the
+binary functions instead of wrapping them in <i>newtype</i>s and then using
+<span class="fixed">mappend</span> and <span class="fixed">mempty</span>.
+<span class="fixed">mconcat</span> seems useful for <span class="fixed">Any</span>
+and <span class="fixed">All</span>, but usually it's easier to use the
+<span class="fixed">or</span> and <span class="fixed">and</span> functions,
+which take lists of <span class="fixed">Bool</span>s and return
+<span class="fixed">True</span> if any of them are <span class="fixed">True</span> or
+if all of them are <span class="fixed">True</span>, respectively.
+</p>
+
+<h3>The <span class="fixed">Ordering</span> monoid</h3>
+
+<p>
+Hey, remember the <span class="fixed">Ordering</span> type? It's used as the
+result when comparing things and it can have three values: <span class="fixed">LT</span>,
+<span class="fixed">EQ</span> and <span class="fixed">GT</span>, which stand for
+<i>less than</i>, <i>equal</i> and <i>greater than</i> respectively:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; 1 `compare` 2
+LT
+ghci&gt; 2 `compare` 2
+EQ
+ghci&gt; 3 `compare` 2
+GT
+</pre>
+
+<p>
+With lists, numbers and boolean values, finding monoids was just a matter of
+looking at already existing commonly used functions and seeing if they exhibit
+some sort of monoid behavior. With <span class="fixed">Ordering</span>, we have
+to look a bit harder to recognize a monoid, but it turns out that its
+<span class="fixed">Monoid</span> instance is just as intuitive as the ones
+we've met so far and also quite useful:
+</p>
+
+<pre name="code" class="haskell:hs">
+instance Monoid Ordering where
+    mempty = EQ
+    LT `mappend` _ = LT
+    EQ `mappend` y = y
+    GT `mappend` _ = GT
+</pre>
+
+<img src="http://s3.amazonaws.com/lyah/bear.png" alt="did anyone ORDER pizza?!?! I can't BEAR these puns!" class="right" width="330" height="339">
+
+<p>
+The instance is set up like this: when we <span class="fixed">mappend</span> two
+<span class="fixed">Ordering</span> values, the one on the left is kept, unless
+the value on the left is <span class="fixed">EQ</span>, in which case the right
+one is the result. The identity is <span class="fixed">EQ</span>. At first, this
+may seem kind of arbitrary, but it actually resembles the way we alphabetically
+compare words. We compare the first two letters and if they differ, we can
+already decide which word would go first in a dictionary. However, if the first two
+letters are equal, then we move on to comparing the next pair of letters and
+repeat the process.
+</p>
+
+<p>
+For instance, if we were to alphabetically compare the words
+<span class="fixed">"ox"</span> and <span class="fixed">"on"</span>, we'd first
+compare the first two letters of each word, see that they are equal and then
+move on to comparing the second letter of each word. We see that <span
+class="fixed">'x'</span> is alphabetically greater than <span
+class="fixed">'n'</span>, and so we know how the words compare. To gain some
+intuition for <span class="fixed">EQ</span> being the identity, we can notice
+that if we were to cram the same letter in the same position in both words, it
+wouldn't change their alphabetical ordering. <span class="fixed">"oix"</span> is
+still alphabetically greater than and <span class="fixed">"oin"</span>.
+</p>
+
+<p>
+It's important to note that in the <span class="fixed">Monoid</span> instance
+for <span class="fixed">Ordering</span>, <span class="fixed">x `mappend` y</span>
+doesn't equal <span class="fixed">y `mappend` x</span>. Because the first
+parameter is kept unless it's <span class="fixed">EQ</span>, <span
+class="fixed">LT `mappend` GT</span> will result in <span
+class="fixed">LT</span>, whereas <span class="fixed">GT `mappend` LT</span> will
+result in <span class="fixed">GT</span>:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; LT `mappend` GT
+LT
+ghci&gt; GT `mappend` LT
+GT
+ghci&gt; mempty `mappend` LT
+LT
+ghci&gt; mempty `mappend` GT
+GT
+</pre>
+
+<p>
+OK, so how is this monoid useful? Let's say you were writing a function that
+takes two strings, compares their lengths, and returns an <span
+class="fixed">Ordering</span>. But if the strings are of the same length, then
+instead of returning <span class="fixed">EQ</span> right away, we want to
+compare them alphabetically. One way to write this would be like so:
+</p>
+
+<pre name="code" class="haskell:hs">
+lengthCompare :: String -&gt; String -&gt; Ordering
+lengthCompare x y = let a = length x `compare` length y
+                        b = x `compare` y
+                    in  if a == EQ then b else a
+</pre>
+
+<p>
+We name the result of comparing the lengths <span class="fixed">a</span> and the
+result of the alphabetical comparison <span class="fixed">b</span> and then if
+it turns out that the lengths were equal, we return their alphabetical ordering.
+</p>
+
+<p>
+But by employing our understanding of how <span class="fixed">Ordering</span> is
+a monoid, we can rewrite this function in a much simpler manner:
+</p>
+
+<pre name="code" class="haskell:hs">
+import Data.Monoid
+
+lengthCompare :: String -&gt; String -&gt; Ordering
+lengthCompare x y = (length x `compare` length y) `mappend`
+                    (x `compare` y)
+</pre>
+
+<p>
+We can try this out:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; lengthCompare "zen" "ants"
+LT
+ghci&gt; lengthCompare "zen" "ant"
+GT
+</pre>
+
+<p>
+Remember, when we use <span class="fixed">mappend</span>, its left parameter is
+always kept unless it's <span class="fixed">EQ</span>, in which case the right
+one is kept. That's why we put the comparison that we consider to be the first,
+more important criterion as the first parameter. If we wanted to expand this
+function to also compare for the number of vowels and set this to be the second
+most important criterion for comparison, we'd just modify it like this:
+</p>
+
+<pre name="code" class="haskell:hs">
+import Data.Monoid
+
+lengthCompare :: String -&gt; String -&gt; Ordering
+lengthCompare x y = (length x `compare` length y) `mappend`
+                    (vowels x `compare` vowels y) `mappend`
+                    (x `compare` y)
+    where vowels = length . filter (`elem` "aeiou")
+</pre>
+
+<p>
+We made a helper function, which takes a string and tells us how many vowels it
+has by first filtering it only for letters that are in the string <span
+class="fixed">"aeiou"</span> and then applying <span class="fixed">length</span>
+to that.
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; lengthCompare "zen" "anna"
+LT
+ghci&gt; lengthCompare "zen" "ana"
+LT
+ghci&gt; lengthCompare "zen" "ann"
+GT
+</pre>
+
+<p>
+Very cool. Here, we see how in the first example the lengths are found to be
+different and so <span class="fixed">LT</span> is returned, because the length
+of <span class="fixed">"zen"</span> is less than the length of
+<span class="fixed">"anna"</span>. In the second example, the lengths are the
+same, but the second string has more vowels, so <span class="fixed">LT</span> is
+returned again. In the third example, they both have the same length and the
+same number of vowels, so they're compared alphabetically and
+<span class="fixed">"zen"</span> wins.
+</p>
+
+<p>
+The <span class="fixed">Ordering</span> monoid is very cool because it allows us
+to easily compare things by many different criteria and put those criteria in an
+order themselves, ranging from the most important to the least.
+</p>
+
+<h3><span class="fixed">Maybe</span> the monoid</h3>
+
+<p>
+Let's take a look at the various ways that <span class="fixed">Maybe a</span>
+can be made an instance of <span class="fixed">Monoid</span> and what those
+instances are useful for.
+</p>
+
+<p>
+One way is to treat <span class="fixed">Maybe a</span> as a monoid only if
+its type parameter <span class="fixed">a</span> is a monoid as well and then
+implement <span class="fixed">mappend</span> in such a way that it uses the
+<span class="fixed">mappend</span> operation of the values that are wrapped
+with <span class="fixed">Just</span>. We use <span class="fixed">Nothing</span>
+as the identity, and so if one of the two values that we're
+<span class="fixed">mappend</span>ing is <span class="fixed">Nothing</span>, we
+keep the other value. Here's the instance declaration:
+</p>
+
+<pre name="code" class="haskell:hs">
+instance Monoid a =&gt; Monoid (Maybe a) where
+    mempty = Nothing
+    Nothing `mappend` m = m
+    m `mappend` Nothing = m
+    Just m1 `mappend` Just m2 = Just (m1 `mappend` m2)
+</pre>
+
+<p>
+Notice the class constraint. It says that <span class="fixed">Maybe a</span> is
+an instance of <span class="fixed">Monoid</span> only if <span
+class="fixed">a</span> is an instance of <span class="fixed">Monoid</span>.
+If we <span class="fixed">mappend</span> something with a <span
+class="fixed">Nothing</span>,
+the result is that something. If we <span class="fixed">mappend</span> two <span
+class="fixed">Just</span> values, the contents of the <span
+class="fixed">Just</span>s get
+<span class="fixed">mappended</span> and then wrapped back in a <span
+class="fixed">Just</span>. We can do this because the class constraint ensures
+that the type of what's inside the <span class="fixed">Just</span> is an
+instance of <span class="fixed">Monoid</span>.
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; Nothing `mappend` Just "andy"
+Just "andy"
+ghci&gt; Just LT `mappend` Nothing
+Just LT
+ghci&gt; Just (Sum 3) `mappend` Just (Sum 4)
+Just (Sum {getSum = 7})
+</pre>
+
+<p>
+This comes in use when you're dealing with monoids as results of computations
+that may have failed. Because of this instance, we don't have to check if the
+computations have failed by seeing if they're a <span class="fixed">Nothing</span> or
+<span class="fixed">Just</span> value; we can just continue to treat them as
+normal monoids.
+</p>
+
+<p>
+But what if the type of the contents of the <span class="fixed">Maybe</span>
+aren't an instance of <span class="fixed">Monoid</span>? Notice that in the
+previous instance declaration, the only case where we have to rely on the
+contents being monoids is when both parameters of <span class="fixed">mappend</span>
+are <span class="fixed">Just</span> values. But if we don't know if the contents
+are monoids, we can't use <span class="fixed">mappend</span> between them, so
+what are we to do? Well, one thing we can do is to just discard the second value
+and keep the first one. For this, the <span class="fixed">First a</span>
+type exists and this is its definition:
+</p>
+
+<pre name="code" class="haskell:hs">
+newtype First a = First { getFirst :: Maybe a }
+    deriving (Eq, Ord, Read, Show)
+</pre>
+
+<p>
+We take a <span class="fixed">Maybe a</span> and we wrap it with a
+<i>newtype</i>. The <span class="fixed">Monoid</span> instance is as follows:
+</p>
+
+<pre name="code" class="haskell:hs">
+instance Monoid (First a) where
+    mempty = First Nothing
+    First (Just x) `mappend` _ = First (Just x)
+    First Nothing `mappend` x = x
+</pre>
+
+<p>
+Just like we said. <span class="fixed">mempty</span> is just a
+<span class="fixed">Nothing</span> wrapped with the <span class="fixed">First</span>
+<i>newtype</i> constructor. If <span class="fixed">mappend</span>'s first
+parameter is a <span class="fixed">Just</span> value, we ignore the second one.
+If the first one is a <span class="fixed">Nothing</span>, then we present the
+second parameter as a result, regardless of whether it's a <span class="fixed">Just</span>
+or a <span class="fixed">Nothing</span>:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; getFirst $ First (Just 'a') `mappend` First (Just 'b')
+Just 'a'
+ghci&gt; getFirst $ First Nothing `mappend` First (Just 'b')
+Just 'b'
+ghci&gt; getFirst $ First (Just 'a') `mappend` First Nothing
+Just 'a'
+</pre>
+
+<p>
+<span class="fixed">First</span> is useful when we have a bunch of <span
+class="fixed">Maybe</span> values
+and we just want to know if any of them is a <span class="fixed">Just</span>.
+The <span class="fixed">mconcat</span> function comes in handy:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; getFirst . mconcat . map First $ [Nothing, Just 9, Just 10]
+Just 9
+</pre>
+
+<p>
+If we want a monoid on <span class="fixed">Maybe a</span> such that the second
+parameter is kept if both parameters of <span class="fixed">mappend</span> are
+<span class="fixed">Just</span> values, <span class="fixed">Data.Monoid</span>
+provides a the <span class="fixed">Last a</span> type, which works like <span
+class="fixed">First a</span>, only the last non-<span
+class="fixed">Nothing</span>
+value is kept when <span class="fixed">mappend</span>ing and using <span
+class="fixed">mconcat</span>:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; getLast . mconcat . map Last $ [Nothing, Just 9, Just 10]
+Just 10
+ghci&gt; getLast $ Last (Just "one") `mappend` Last (Just "two")
+Just "two"
+</pre>
+
+<h3>Using monoids to fold data structures</h3>
+
+<p>
+One of the more interesting ways to put monoids to work is to make them help us
+define folds over various data structures. So far, we've only done folds over
+lists, but lists aren't the only data structure that can be folded over. We can
+define folds over almost any data structure. Trees especially lend themselves well
+to folding.
+</p>
+
+<p>
+Because there are so many data structures that work nicely with folds, the
+<span class="label class">Foldable</span> type class was introduced. Much like
+<span class="fixed">Functor</span> is for things that can be mapped over,
+<span class="fixed">Foldable</span> is for things that can be folded up! It can
+be found in <span class="fixed">Data.Foldable</span> and because it export
+functions whose names clash with the ones from the <span class="fixed">Prelude</span>,
+it's best imported qualified (and served with basil):
+</p>
+
+<pre name="code" class="haskell:hs">
+import qualified Foldable as F
+</pre>
+
+<p>
+To save ourselves precious keystrokes, we've chosen to import it qualified as
+<span class="fixed">F</span>. Alright, so what are some of the functions that
+this type class defines? Well, among them are <span class="fixed">foldr</span>,
+<span class="fixed">foldl</span>, <span class="fixed">foldr1</span> and <span class="fixed">foldl1</span>.
+Huh? But we already know these functions, what's so new about this? Let's
+compare the types of <span class="fixed">Foldable</span>'s <span class="fixed">foldr</span> and
+the <span class="fixed">foldr</span> from the <span class="fixed">Prelude</span>
+to see how they differ:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; :t foldr
+foldr :: (a -&gt; b -&gt; b) -&gt; b -&gt; [a] -&gt; b
+ghci&gt; :t F.foldr
+F.foldr :: (F.Foldable t) =&gt; (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b
+</pre>
+
+<p>
+Ah! So whereas <span class="fixed">foldr</span> takes a list and folds it up,
+the <span class="fixed">foldr</span> from
+<span class="fixed">Data.Foldable</span> accepts any type that can be folded up,
+not just lists! As expected, both <span class="fixed">foldr</span> functions do
+the same for lists:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; foldr (*) 1 [1,2,3]
+6
+ghci&gt; F.foldr (*) 1 [1,2,3]
+6
+</pre>
+
+<p>
+Okay then, what are some other data structures that support folds? Well, there's
+the <span class="fixed">Maybe</span> we all know and love!
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; F.foldl (+) 2 (Just 9)
+11
+ghci&gt; F.foldr (||) False (Just True)
+True
+</pre>
+
+<p>
+But folding over a <span class="fixed">Maybe</span> value isn't terribly
+interesting, because when it comes to folding, it just acts like a list with one
+element if it's a <span class="fixed">Just</span> value and as an empty list if
+it's <span class="fixed">Nothing</span>. So let's examine a data structure
+that's a little more complex then.
+</p>
+
+<p>
+Remember the tree data structure from the <a
+href="making-our-own-types-and-typeclasses#recursive-data-structures">Making Our
+Own Types and Typeclasses</a> chapter? We defined it like this:
+</p>
+
+<pre name="code" class="haskell:hs">
+data Tree a = Empty | Node a (Tree a) (Tree a) deriving (Show, Read, Eq)
+</pre>
+
+<p>
+We said that a tree is either an empty tree that doesn't hold any values or it's a node that
+holds one value and also two other trees. After defining it, we made it an
+instance of <span class="fixed">Functor</span> and with that we gained the
+ability to <span class="fixed">fmap</span> functions over it. Now, we're going
+to make it an instance of <span class="fixed">Foldable</span> so that we get the
+abilty to fold it up. One way to make a type constructor an instance of
+<span class="fixed">Foldable</span> is to just directly implement <span class="fixed">foldr</span> for it.
+But another, often much easier way, is to implement the <span class="fixed">foldMap</span> function,
+which is also a part of the <span class="fixed">Foldable</span> type class. The
+<span class="fixed">foldMap</span> function has the following type:
+</p>
+
+<pre name="code" class="haskell:hs">
+foldMap :: (Monoid m, Foldable t) =&gt; (a -&gt; m) -&gt; t a -&gt; m
+</pre>
+
+<p>
+Its first parameter is a function that takes a value of the type that
+our foldable structure contains (denoted here with <span class="fixed">a</span>)
+and returns a monoid value. Its second parameter is a foldable structure that
+contains values of type <span class="fixed">a</span>. It maps that function over
+the foldable structure, thus producing a foldable structure that contains
+monoid values. Then, by doing <span class="fixed">mappend</span> between those
+monoid values, it joins them all into a single monoid value. This function
+may sound kind of odd at the moment, but we'll see that it's very easy to
+implement. What's also cool is that implementing this function is all it takes for
+our type to be made an instance of <span class="fixed">Foldable</span>. So if we
+just implement <span class="fixed">foldMap</span> for some type, we get
+<span class="fixed">foldr</span> and <span class="fixed">foldl</span> on that
+type for free!
+</p>
+
+<p>
+This is how we make <span class="fixed">Tree</span> an instance of
+<span class="fixed">Foldable</span>:
+</p>
+
+<pre name="code" class="haskell:hs">
+instance F.Foldable Tree where
+    foldMap f Empty = mempty
+    foldMap f (Node x l r) = F.foldMap f l `mappend`
+                             f x           `mappend`
+                             F.foldMap f r
+</pre>
+
+<img src="http://s3.amazonaws.com/lyah/accordion.png" alt="find the visual pun or whatever" class="right" width="366" height="280">
+
+<p>
+We think like this: if we are provided with a function that takes an element of
+our tree and returns a monoid value, how do we reduce our whole tree down to one
+single monoid value? When we were doing <span class="fixed">fmap</span> over our tree,
+we applied the function that we were mapping to a node and then we recursively
+mapped the function over the left sub-tree as well as the right one. Here, we're
+tasked with not only mapping a function, but with also joining up the results
+into a single monoid value by using <span class="fixed">mappend</span>. First we
+consider the case of the empty tree &mdash; a sad and lonely tree that has no
+values or sub-trees. It doesn't hold any value that we can give to our monoid-making
+function, so we just say that if our tree is empty, the monoid value it becomes
+is <span class="fixed">mempty</span>.
+</p>
+
+<p>
+The case of a non-empty node is a bit more interesting. It contains two
+sub-trees as well as a value. In this case, we recursively <span class="fixed">foldMap</span> the
+same function <span class="fixed">f</span> over the left and the right
+sub-trees. Remember, our <span class="fixed">foldMap</span> results in a single
+monoid value. We also apply our function <span class="fixed">f</span> to the
+value in the node. Now we have three monoid values (two from our sub-trees and
+one from applying <span class="fixed">f</span> to the value in the node) and we
+just have to bang them together into a single value. For this purpose we use
+<span class="fixed">mappend</span>, and naturally the left sub-tree comes first,
+then the node value and then the right sub-tree.
+</p>
+
+<p>
+Notice that we didn't have to provide the function that takes a value and
+returns a monoid value. We receive that function as a parameter to <span class="fixed">foldMap</span>
+and all we have to decide is where to apply that function and how to join up
+the resulting monoids from it.
+</p>
+
+<p>
+Now that we have a <span class="fixed">Foldable</span> instance for our tree
+type, we get <span class="fixed">foldr</span> and <span class="fixed">foldl</span> for free!
+Consider this tree:
+</p>
+
+<pre name="code" class="haskell:hs">
+testTree = Node 5
+            (Node 3
+                (Node 1 Empty Empty)
+                (Node 6 Empty Empty)
+            )
+            (Node 9
+                (Node 8 Empty Empty)
+                (Node 10 Empty Empty)
+            )
+</pre>
+
+<p>
+It has <span class="fixed">5</span> at its root and then its left node is has
+<span class="fixed">3</span> with <span class="fixed">1</span> on the left and
+<span class="fixed">6</span> on the right. The root's right node has a <span
+class="fixed">9</span>
+and then an <span class="fixed">8</span> to its left and a <span
+class="fixed">10</span> on the far right side. With a <span class="fixed">Foldable</span> instance,
+we can do all of the folds that we can do on lists:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; F.foldl (+) 0 testTree
+42
+ghci&gt; F.foldl (*) 1 testTree
+64800
+</pre>
+
+<p>
+And also, <span class="fixed">foldMap</span> isn't only useful for making new instances of
+<span class="fixed">Foldable</span>; it comes in handy for reducing our
+structure to a single monoid value. For instance, if we want to know if any number in our
+tree is equal to <span class="fixed">3</span>, we can do this:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; getAny $ F.foldMap (\x -&gt; Any $ x == 3) testTree
+True
+</pre>
+
+<p>
+Here, <span class="fixed">\x -&gt; Any $ x == 3</span> is a function that takes
+a number and returns a monoid value, namely a <span class="fixed">Bool</span>
+wrapped in <span class="fixed">Any</span>. <span class="fixed">foldMap</span>
+applies this function to every element in our tree and then reduces the
+resulting monoids into a single monoid with <span class="fixed">mappend</span>.
+If we do this:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; getAny $ F.foldMap (\x -&gt; Any $ x &gt; 15) testTree
+False
+</pre>
+
+<p>
+All of the nodes in our tree would hold the value <span class="fixed">Any
+False</span> after having the function in the lambda applied to them. But to end
+up <span class="fixed">True</span>,
+<span class="fixed">mappend</span> for <span class="fixed">Any</span> has to
+have at least one <span class="fixed">True</span> value as a parameter. That's
+why the final result is <span class="fixed">False</span>, which makes sense
+because no value in our tree is greater than <span class="fixed">15</span>.
+</p>
+
+<p>
+We can also easily turn our tree into a list by doing a
+<span class="fixed">foldMap</span> with the <span class="fixed">\x -&gt; [x]</span>
+function. By first projecting that function onto our tree, each element becomes
+a singleton list. The <span class="fixed">mappend</span> action that takes place
+between all those singleton list results in a single list that holds all of the
+elements that are in our tree:
+</p>
+
+<pre name="code" class="haskell:hs">
+ghci&gt; F.foldMap (\x -&gt; [x]) testTree
+[1,3,6,5,8,9,10]
+</pre>
+
+<p>
+What's cool is that all of these trick aren't limited to trees, they work on any
+instance of <span class="fixed">Foldable</span>.
+</p>
