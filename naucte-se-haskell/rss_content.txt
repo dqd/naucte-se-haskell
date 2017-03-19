@@ -1,3 +1,4 @@
+19. 3. 2017: Aktualizace obsahu dle originálu, pojďte se připojit k překládání
 7. 3. 2010: Dokončen překlad kapitoly o modulech (po roce!)
 7. 3. 2009: Dokončen překlad kapitoly o funkcích vyššího řádu
 8. 1. 2009: Dokončen překlad kapitoly o rekurzi

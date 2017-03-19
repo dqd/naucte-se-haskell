@@ -113,11 +113,42 @@
             'subchapters' => array
                 ('functors-redux' => 'Functors redux'
                 ,'applicative-functors' => 'Applicative functors'
-                ,'newtype' => 'Newtype'
-                //monoids
-                //foldable
+                ,'newtype' => 'The newtype keyword'
+                ,'monoids' => 'Monoids',
                 )
-        )
+        ),
+        'a-fistful-of-monads' => array(
+            'title' => 'A Fistful of Monads',
+            'subchapters' => array
+                ('getting-our-feet-wet-with-maybe' => 'Getting our feet wet with Maybe'
+                ,'the-monad-type-class' => 'The Monad type class'
+                ,'walk-the-line' => 'Walk the line'
+                ,'do-notation' => 'do notation'
+                ,'the-list-monad' => 'The list monad'
+                ,'monad-laws' => 'Monad laws'
+                )
+        ),
+        'for-a-few-monads-more' => array(
+            'title' => 'For a Few Monads More',
+            'subchapters' => array
+                ('writer-i-hardly-know-her' => 'Writer? I hardly know her!'
+                ,'reader-ugh-not-this-joke-again' => 'Reader? Ugh, not this joke again.'
+                ,'tasteful-stateful-computations' => 'Tasteful stateful computations'
+                ,'error-error-on-the-wall' => 'Error error on the wall'
+                ,'some-useful-monadic-functions' => 'Some useful monadic functions'
+                ,'making-monads' => 'Making monads'
+                )
+        ),
+        'zippers' => array(
+            'title' => 'Zippers',
+            'subchapters' => array
+                ('taking-a-walk' => 'Taking a walk'
+                ,'a-trail-of-breadcrumbs' => 'A trail of breadcrumbs'
+                ,'focusing-on-lists' => 'Focusing on lists'
+                ,'a-very-simple-file-system' => 'A very simple file system'
+                ,'watch-your-step' => 'Watch your step'
+                )
+        ),
     );
 
     if ($_P[0]=='uvod') {

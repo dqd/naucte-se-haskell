@@ -3,7 +3,7 @@
 <p>We've mentioned that Haskell is a purely functional language. Whereas in imperative languages you usually get things done by giving the computer a series of steps to execute, functional programming is more of defining what stuff is. In Haskell, a function can't change some state, like changing the contents of a variable (when a function changes state, we say that the function has <i>side-effects</i>). The only thing a function can do in Haskell is give us back some result based on the parameters we gave it. If a function is called two times with the same parameters, it has to return the same result. While this may seem a bit limiting when you're coming from an imperative world, we've seen that it's actually really cool. In an imperative language, you have no guarantee that a simple function that should just crunch some numbers won't burn down your house, kidnap your dog and scratch your car with a potato while crunching those numbers. For instance, when we were making a binary search tree, we didn't insert an element into a tree by modifying some tree in place. Our function for inserting into a binary search tree actually returned a new tree, because it can't change the old one.</p>
 <p>While functions being unable to change state is good because it helps us reason about our programs, there's one problem with that. If a function can't change anything in the world, how is it supposed to tell us what it calculated? In order to tell us what it calculated, it has to change the state of an output device (usually the state of the screen), which then emits photons that travel to our brain and change the state of our mind, man.</p>
 <p>Do not despair, all is not lost. It turns out that Haskell actually has a really clever system for dealing with functions that have side-effects that neatly separates the part of our program that is pure and the part of our program that is impure, which does all the dirty work like talking to the keyboard and the screen. With those two parts separated, we can still reason about our pure program and take advantage of all the things that purity offers, like laziness, robustness and modularity while efficiently communicating with the outside world.</p>
-<a name="hello-world"></a><h2><?=$contents[$_P[0]]['subchapters']['hello-world']?></h2>
+<a name="hello-world"></a><h2>Hello, world!</h2>
 <img src="images/helloworld.png" alt="HELLO!" class="left" width="223" height="179">
 <p>Up until now, we've always loaded our functions into GHCI to test them out and play with them. We've also explored the standard library functions that way. But now, after eight or so chapters, we're finally going to write our first <i>real</i> Haskell program! Yay! And sure enough, we're going to do the good old <span class="fixed">"hello, world"</span> schtick.</p>
 <div class="hintbox"><em>Hey!</em> For the purposes of this chapter, I'm going to assume you're using a unix-y environment for learning Haskell. If you're in Windows, I'd suggest you download <a href="http://www.cygwin.com/">Cygwin</a>, which is a Linux-like environment for Windows, A.K.A. just what you need.</div>
@@ -18,7 +18,7 @@ $ ghc --make helloworld
 [1 of 1] Compiling Main             ( helloworld.hs, helloworld.o )
 Linking helloworld ...
 </pre>
-<p>Okay! With any luck, you got something like this and now you can run your program by doing <span class="fixed">./helloworld</span>.</p> 
+<p>Okay! With any luck, you got something like this and now you can run your program by doing <span class="fixed">./helloworld</span>.</p>
 <pre name="code" class="haskell:hs">
 $ ./helloworld
 hello, world
@@ -101,7 +101,7 @@ main = do
 <p>You may be wondering when to use <span class="fixed">&lt;-</span> and when to use <i>let</i> bindings? Well, remember, <span class="fixed">&lt;-</span> is (for now) for performing I/O actions and binding their results to names. <span class="fixed">map toUpper firstName</span>, however, isn't an I/O action. It's a pure expression in Haskell. So use <span class="fixed">&lt;-</span> when you want to bind results of I/O actions to names and you can use <i>let</i> bindings to bind pure expressions to names. Had we done something like <span class="fixed">let firstName = getLine</span>, we would have just called the <span class="fixed">getLine</span> I/O action a different name and we'd still have to run it through a <span class="fixed">&lt;-</span> to perform it.</p>
 <p>Now we're going to make a program that continuously reads a line and prints out the same line with the words reversed. The program's execution will stop when we input a blank line. This is the program:</p>
 <pre name="code" class="haskell:hs">
-main = do 
+main = do
     line &lt;- getLine
     if null line
         then return ()
@@ -155,7 +155,7 @@ main = do
 <pre name="code" class="haskell:hs">
 main = do   putStr "Hey, "
             putStr "I'm "
-            putStrLn "Andy!" 
+            putStrLn "Andy!"
 </pre>
 <pre name="code" class="plain">
 $ runhaskell putstr_test.hs
@@ -211,7 +211,7 @@ ghci&gt; print (map (++"!") ["hey","ho","woo"])
 <p>When we want to print out strings, we usually use <span class="fixed">putStrLn</span> because we don't want the quotes around them, but for printing out values of other types to the terminal, <span class="fixed">print</span> is used the most.</p>
 <p><span class="function label">getChar</span> is an I/O action that reads a character from the input. Thus, its type signature is <span class="fixed">getChar :: IO Char</span>, because the result contained within the I/O action is a <span class="fixed">Char</span>. Note that due to buffering, reading of the characters won't actually happen until the user mashes the return key.</p>
 <pre name="code" class="haskell:hs">
-main = do   
+main = do
     c &lt;- getChar
     if c /= ' '
         then do
@@ -228,7 +228,7 @@ hello
 <p>The second line is the input. We input <span class="fixed">hello sir</span> and then press return. Due to buffering, the execution of the program will begin only when after we've hit return and not after every inputted character. But once we press return, it acts on what we've been putting in so far. Try playing with this program to get a feel for it!</p>
 <p>The <span class="label function">when</span> function is found in <span class="fixed">Control.Monad</span> (to get access to it, do <span class="fixed">import Control.Monad</span>). It's interesting because in a <i>do</i> block it looks like a control flow statement, but it's actually a normal function. It takes a boolean value and an I/O action if that boolean value is <span class="fixed">True</span>, it returns the same I/O action that we supplied to it. However, if it's <span class="fixed">False</span>, it returns the <span class="fixed">return ()</span>, action, so an I/O action that doesn't do anything. Here's how we could rewrite the previous piece of code with which we demonstrated <span class="fixed">getChar</span> by using <span class="fixed">when</span>:</p>
 <pre name="code" class="haskell:hs">
-import Control.Monad 
+import Control.Monad
 
 main = do
     c &lt;- getChar
@@ -263,7 +263,7 @@ ghci&gt; sequence (map print [1,2,3,4,5])
 [(),(),(),(),()]
 </pre>
 <p>What's with the <span class="fixed">[(),(),(),(),()]</span> at the end? Well, when we evaluate an I/O action in GHCI, it's performed and then its result is printed out, unless that result is <span class="fixed">()</span>, in which case it's not printed out. That's why evaluating <span class="fixed">putStrLn "hehe"</span> in GHCI just prints out <span class="fixed">hehe</span> (because the contained result in <span class="fixed">putStrLn "hehe"</span> is <span class="fixed">()</span>). But when we do <span class="fixed">getLine</span> in GHCI, the result of that I/O action is printed out, because <span class="fixed">getLine</span> has a type of <span class="fixed">IO String</span>.</p>
-<p>Because the mapping a function that returns an I/O action over a list and then sequencing it so common, the utility functions <span class="label function">mapM</span> and <span class="label function">mapM_</span> were introduced. <span class="fixed">mapM</span> takes a function and a list, maps the function over the list and then sequences it. <span class="fixed">mapM_</span> does the same, only it throws away the result later. We usually use <span class="fixed">mapM_</span> when we don't care what result our sequenced I/O actions have.</p>
+<p>Because mapping a function that returns an I/O action over a list and then sequencing it is so common, the utility functions <span class="label function">mapM</span> and <span class="label function">mapM_</span> were introduced. <span class="fixed">mapM</span> takes a function and a list, maps the function over the list and then sequences it. <span class="fixed">mapM_</span> does the same, only it throws away the result later. We usually use <span class="fixed">mapM_</span> when we don't care what result our sequenced I/O actions have.</p>
 <pre name="code" class="haskell:hs">
 ghci&gt; mapM print [1,2,3]
 1
@@ -289,7 +289,7 @@ main = forever $ do
 <pre name="code" class="haskell:hs">
 import Control.Monad
 
-main = do 
+main = do
     colors &lt;- forM [1,2,3,4] (\a -&gt; do
         putStrLn $ "Which color do you associate with the number " ++ show a ++ "?"
         color &lt;- getLine
@@ -318,14 +318,14 @@ orange
 <p>We could have actually done that without <span class="fixed">forM</span>, only with <span class="fixed">forM</span> it's more readable. Normally we write <span class="fixed">forM</span> when we want to map and sequence some actions that we define there on the spot using <i>do</i> notation. In the same vein, we could have replaced the last line with <span class="fixed">forM colors putStrLn</span>.</p>
 <p>In this section, we learned the basics of input and output. We also found out what I/O actions are, how they enable us to do input and output and when they are actually performed. To reiterate, I/O actions are values much like any other value in Haskell. We can pass them as parameters to functions and functions can return I/O actions as results. What's special about them is that if they fall into the <span class="fixed">main</span> function (or are the result in a GHCI line), they are performed. And that's when they get to write stuff on your screen or play Yakety Sax through your speakers. Each I/O action can also encapsulate a result with which it tells you what it got from the real world.</p>
 <p>Don't think of a function like <span class="fixed">putStrLn</span> as a function that takes a string and prints it to the screen. Think of it as a function that takes a string and returns an I/O action. That I/O action will, when performed, print beautiful poetry to your terminal.</p>
-<a name="files-and-streams"></a><h2><?=$contents[$_P[0]]['subchapters']['files-and-streams']?></h2>
+<a name="files-and-streams"></a><h2>Files and streams</h2>
 <img src="images/streams.png" alt="streams" class="right" width="464" height="322">
 <p><span class="fixed">getChar</span> is an I/O action that reads a single character from the terminal. <span class="fixed">getLine</span> is an I/O action that reads a line from the terminal. These two are pretty straightforward and most programming languages have some functions or statements that are parallel to them. But now, let's meet <span class="label function">getContents</span>. <span class="fixed">getContents</span> is an I/O action that reads everything from the standard input until it encounters an end-of-file character. Its type is <span class="fixed">getContents :: IO String</span>. What's cool about <span class="fixed">getContents</span> is that it does lazy I/O. When we do <span class="fixed">foo &lt;- getContents</span>, it doesn't read all of the input at once, store it in memory and then bind it to <span class="fixed">foo</span>. No, it's lazy! It'll say: <i>"Yeah yeah, I'll read the input from the terminal later as we go along, when you really need it!"</i>. </p>
 <p><span class="fixed">getContents</span> is really useful when we're piping the output from one program into the input of our program. In case you don't know how piping works in unix-y systems, here's a quick primer. Let's make a text file that contains the following little haiku:</p>
 <pre name="code" class="plain">
 I'm a lil' teapot
 What's with that airplane food, huh?
-It's so small, tasteless 
+It's so small, tasteless
 </pre>
 <p>Yeah, the haiku sucks, what of it? If anyone knows of any good haiku tutorials, let me know.</p>
 <p>Now, recall the little program we wrote when we were introducing the <span class="fixed">forever</span> function. It prompted the user for a line, returned it to him in CAPSLOCK and then did that all over again, indefinitely. Just so you don't have to scroll all the way back, here it is again:</p>
@@ -340,7 +340,7 @@ main = forever $ do
 </pre>
 <p>We'll save that program as <span class="fixed">capslocker.hs</span> or something and compile it. And then, we're going to use a unix pipe to feed our text file directly to our little program. We're going to use the help of the GNU <i>cat</i> program, which prints out a file that's given to it as an argument. Check it out, booyaka!</p>
 <pre name="code" class="plain">
-$ ghc --make capslocker 
+$ ghc --make capslocker
 [1 of 1] Compiling Main             ( capslocker.hs, capslocker.o )
 Linking capslocker ...
 $ cat haiku.txt
@@ -385,7 +385,7 @@ main = do
     putStr (shortLinesOnly contents)
 
 shortLinesOnly :: String -&gt; String
-shortLinesOnly input = 
+shortLinesOnly input =
     let allLines = lines input
         shortLines = filter (\line -&gt; length line &lt; 10) allLines
         result = unlines shortLines
@@ -417,7 +417,7 @@ short
 main = interact shortLinesOnly
 
 shortLinesOnly :: String -&gt; String
-shortLinesOnly input = 
+shortLinesOnly input =
     let allLines = lines input
         shortLines = filter (\line -&gt; length line &lt; 10) allLines
         result = unlines shortLines
@@ -475,9 +475,9 @@ palindrome
 <p>So far, we've worked with I/O by printing out stuff to the terminal and reading from it. But what about reading and writing files? Well, in a way, we've already been doing that. One way to think about reading from the terminal is to imagine that it's like reading from a (somewhat special) file. Same goes for writing to the terminal, it's kind of like writing to a file. We can call these two files <span class="fixed">stdout</span> and <span class="fixed">stdin</span>, meaning <i>standard output</i> and <i>standard input</i>, respectively. Keeping that in mind, we'll see that writing to and reading from files is very much like writing to the standard output and reading from the standard input.</p>
 <p>We'll start off with a really simple program that opens a file called <i>girlfriend.txt</i>, which contains a verse from Avril Lavigne's #1&nbsp;hit <i>Girlfriend</i>, and just prints out out to the terminal. Here's <i>girlfriend.txt</i>:</p>
 <pre name="code" class="plain">
-Hey! Hey! You! You! 
-I don't like your girlfriend! 
-No way! No way! 
+Hey! Hey! You! You!
+I don't like your girlfriend!
+No way! No way!
 I think you need a new one!
 </pre>
 <p>And here's our program:</p>
@@ -516,18 +516,18 @@ data IOMode = ReadMode | WriteMode | AppendMode | ReadWriteMode
 <p>With <span class="fixed">putStr contents</span> we just print the contents out to the standard output and then we do <span class="label function">hClose</span>, which takes a handle and returns an I/O action that closes the file. You have to close the file yourself after opening it with <span class="fixed">openFile</span>!</p>
 <p>Another way of doing what we just did is to use the <span class="label function">withFile</span> function, which has a type signature of <span class="fixed">withFile :: FilePath -&gt; IOMode -&gt; (Handle -&gt; IO a) -&gt; IO a</span>. It takes a path to a file, an <span class="fixed">IOMode</span> and then it takes a function that takes a handle and returns some I/O action. What it returns is an I/O action that will open that file, do something we want with the file and then close it. The result encapsulated in the final I/O action that's returned is the same as the result of the I/O action that the function we give it returns. This might sound a bit complicated, but it's really simple, especially with lambdas, here's our previous example rewritten to use <span class="fixed">withFile</span>:</p>
 <pre name="code" class="haskell:hs">
-import System.IO   
-  
-main = do   
+import System.IO
+
+main = do
     withFile "girlfriend.txt" ReadMode (\handle -&gt; do
-        contents &lt;- hGetContents handle   
+        contents &lt;- hGetContents handle
         putStr contents)
 </pre>
 <p>As you can see, it's very similar to the previous piece of code. <span class="fixed">(\handle -&gt; ... )</span> is the function that takes a handle and returns an I/O action and it's usually done like this, with a lambda. The reason it has to take a function that returns an I/O action instead of just taking an I/O action to do and then close the file is because the I/O action that we'd pass to it wouldn't know on which file to operate. This way, <span class="fixed">withFile</span> opens the file and then passes the handle to the function we gave it. It gets an I/O action back from that function and then makes an I/O action that's just like it, only it closes the file afterwards. Here's how we can make our own <span class="fixed">withFile</span> function:</p>
 <pre name="code" class="haskell:hs">
 withFile' :: FilePath -&gt; IOMode -&gt; (Handle -&gt; IO a) -&gt; IO a
 withFile' path mode f = do
-    handle &lt;- openFile path mode 
+    handle &lt;- openFile path mode
     result &lt;- f handle
     hClose handle
     return result
@@ -537,9 +537,9 @@ withFile' path mode f = do
 <p>Just like we have <span class="fixed">hGetContents</span> that works like <span class="fixed">getContents</span> but for a specific file, there's also <span class="label function">hGetLine</span>, <span class="label function">hPutStr</span>, <span class="label function">hPutStrLn</span>, <span class="label function">hGetChar</span>, etc. They work just like their counterparts without the <i>h</i>, only they take a handle as a parameter and operate on that specific file instead of operating on standard input or standard output. Example: <span class="fixed">putStrLn</span> is a function that takes a string and returns an I/O action that will print out that string to the terminal and a newline after it. <span class="fixed">hPutStrLn</span> takes a handle and a string and returns an I/O action that will write that string to the file associated with the handle and then put a newline after it. In the same vein, <span class="fixed">hGetLine</span> takes a handle and returns an I/O action that reads a line from its file.</p>
 <p>Loading files and then treating their contents as strings is so common that we have these three nice little functions to make our work even easier:</p>
 <p>
-<span class="label function">readFile</span> has a type signature of <span class="fixed">readFile :: FilePath -&gt; IO String</span>. 
-Remember, <span class="fixed">FilePath</span> is just a fancy name for <span class="fixed">String</span>. 
-<span class="fixed">readFile</span> takes a path to a file and returns an I/O action that will read that file (lazily, of course) and bind its contents to something as a string. 
+<span class="label function">readFile</span> has a type signature of <span class="fixed">readFile :: FilePath -&gt; IO String</span>.
+Remember, <span class="fixed">FilePath</span> is just a fancy name for <span class="fixed">String</span>.
+<span class="fixed">readFile</span> takes a path to a file and returns an I/O action that will read that file (lazily, of course) and bind its contents to something as a string.
 It's usually more handy than doing <span class="fixed">openFile</span> and binding it to a handle and then doing <span class="fixed">hGetContents</span>.
 Here's how we could have written our previous example with <span class="fixed">readFile</span>:
 </p>
@@ -558,11 +558,11 @@ Because we don't get a handle with which to identify our file, we can't close it
 It takes a path to a file and a string to write to that file and returns an I/O action that will do the writing. If such a file already exists, it will be stomped down to zero length before being written on. Here's how to turn <i>girlfriend.txt</i> into a CAPSLOCKED version and write it to <i>girlfriendcaps.txt</i>:
 </p>
 <pre name="code" class="haskell:hs">
-import System.IO   
+import System.IO
 import Data.Char
-  
-main = do   
-    contents &lt;- readFile "girlfriend.txt"   
+
+main = do
+    contents &lt;- readFile "girlfriend.txt"
     writeFile "girlfriendcaps.txt" (map toUpper contents)
 </pre>
 <pre name="code" class="plain">
@@ -576,9 +576,9 @@ I THINK YOU NEED A NEW ONE!
 <p><span class="label function">appendFile</span> has a type signature that's just like <span class="fixed">writeFile</span>, only <span class="fixed">appendFile</span> doesn't truncate the file to zero length if it already exists but it appends stuff to it.</p>
 <p>Let's say we have a file <i>todo.txt</i> that has one task per line that we have to do. Now let's make a program that takes a line from the standard input and adds that to our to-do list.</p>
 <pre name="code" class="haskell:hs">
-import System.IO   
-  
-main = do   
+import System.IO
+
+main = do
     todoItem &lt;- getLine
     appendFile "todo.txt" (todoItem ++ "\n")
 </pre>
@@ -597,7 +597,7 @@ Take salad out of the oven
 <p>We needed to add the <span class="fixed">"\n"</span> to the end of each line because <span class="fixed">getLine</span> doesn't give us a newline character at the end.</p>
 <p>Ooh, one more thing. We talked about how doing <span class="fixed">contents &lt;- hGetContents handle</span> doesn't cause the whole file to be read at once and stored in-memory. It's I/O lazy, so doing this:</p>
 <pre name="code" class="haskell:hs">
-main = do 
+main = do
     withFile "something.txt" ReadMode (\handle -&gt; do
         contents &lt;- hGetContents handle
         putStr contents)
@@ -606,7 +606,7 @@ main = do
 <p>You can control how exactly buffering is done by using the <span class="fixed">hSetBuffering</span> function. It takes a handle and a <span class="fixed">BufferMode</span> and returns an I/O action that sets the buffering. <span class="fixed">BufferMode</span> is a simple enumeration data type and the possible values it can hold are: <span class="fixed">NoBuffering</span>, <span class="fixed">LineBuffering</span> or <span class="fixed">BlockBuffering (Maybe Int)</span>. The <span class="fixed">Maybe Int</span> is for how big the chunk should be, in bytes. If it's <span class="fixed">Nothing</span>, then the operating system determines the chunk size. <span class="fixed">NoBuffering</span> means that it will be read one character at a time. <span class="fixed">NoBuffering</span> usually sucks as a buffering mode because it has to access the disk so much.</p>
 <p>Here's our previous piece of code, only it doesn't read it line by line but reads the whole file in chunks of 2048 bytes.</p>
 <pre name="code" class="haskell:hs">
-main = do 
+main = do
     withFile "something.txt" ReadMode (\handle -&gt; do
         hSetBuffering handle $ BlockBuffering (Just 2048)
         contents &lt;- hGetContents handle
@@ -622,18 +622,18 @@ import System.IO
 import System.Directory
 import Data.List
 
-main = do      
+main = do
     handle &lt;- openFile "todo.txt" ReadMode
     (tempName, tempHandle) &lt;- openTempFile "." "temp"
     contents &lt;- hGetContents handle
-    let todoTasks = lines contents   
-        numberedTasks = zipWith (\n line -&gt; show n ++ " - " ++ line) [0..] todoTasks   
+    let todoTasks = lines contents
+        numberedTasks = zipWith (\n line -&gt; show n ++ " - " ++ line) [0..] todoTasks
     putStrLn "These are your TO-DO items:"
     putStr $ unlines numberedTasks
-    putStrLn "Which one do you want to delete?"   
-    numberString &lt;- getLine   
-    let number = read numberString   
-        newTodoItems = delete (todoTasks !! number) todoTasks   
+    putStrLn "Which one do you want to delete?"
+    numberString &lt;- getLine
+    let number = read numberString
+        newTodoItems = delete (todoTasks !! number) todoTasks
     hPutStr tempHandle $ unlines newTodoItems
     hClose handle
     hClose tempHandle
@@ -643,7 +643,7 @@ main = do
 <p>At first, we just open <i>todo.txt</i> in read mode and bind its handle to <span class="fixed">handle</span>.
 <p>Next up, we use a function that we haven't met before which is from <span class="fixed">System.IO</span> &mdash; <span class="label function">openTempFile</span>. Its name is pretty self-explanatory. It takes a path to a temporary directory and a template name for a file and opens a temporary file. We used <span class="fixed">"."</span> for the temporary directory, because <span class="fixed">.</span> denotes the current directory on just about any OS. We used <span class="fixed">"temp"</span> as the template name for the temporary file, which means that the temporary file will be named <i>temp</i> plus some random characters. It returns an I/O action that makes the temporary file and the result in that I/O action is a pair of values: the name of the temporary file and a handle. We could just open a normal file called <i>todo2.txt</i> or something like that but it's better practice to use <span class="fixed">openTempFile</span> so you know you're probably not overwriting anything.
 </p>
-<p>The reason we used <span class="fixed">getCurrentDirectory</span> to get the current directory and then passed it to <span class="fixed">openTempFile</span> instead of just passing <span class="fixed">"."</span> to <span class="fixed">openTempFile</span> is because <span class="fixed">.</span> refers to the current directory on unix-like system and Windows
+<p>The reason we didn't use <span class="fixed">getCurrentDirectory</span> to get the current directory and then pass it to <span class="fixed">openTempFile</span> but instead just passed <span class="fixed">"."</span> to <span class="fixed">openTempFile</span> is because <span class="fixed">.</span> refers to the current directory on unix-like system and Windows
 <p>Next up, we bind the contents of <i>todo.txt</i> to <span class="fixed">contents</span>. Then, split that string into a list of strings, each string one line. So <span class="fixed">todoTasks</span> is now something like <span class="fixed">["Iron the dishes", "Dust the dog", "Take salad out of the oven"]</span>. We zip the numbers from 0 onwards and that list with a function that takes a number, like 3, and a string, like <span class="fixed">"hey"</span> and returns <span class="fixed">"3 - hey"</span>, so <span class="fixed">numberedTasks</span> is <span class="fixed">["0 - Iron the dishes", "1 - Dust the dog" ...</span>. We join that list of strings into a single newline delimited string with <span class="fixed">unlines</span> and print that string out to the terminal. Note that instead of doing that, we could have also done <span class="fixed">mapM putStrLn numberedTasks</span></p>
 <p>We ask the user which one they want to delete and wait for them to enter a number. Let's say they want to delete number 1, which is <span class="fixed">Dust the dog</span>, so they punch in <span class="fixed">1</span>. <span class="fixed">numberString</span> is now <span class="fixed">"1"</span> and because we want a number, not a string, we run <span class="fixed">read</span> on that to get <span class="fixed">1</span> and bind that to <span class="fixed">number</span>.</p>
 <p>Remember the <span class="fixed">delete</span> and <span class="fixed">!!</span> functions from <span class="fixed">Data.List</span>. <span class="fixed">!!</span> returns an element from a list with some index and <span class="fixed">delete</span> deletes the first occurence of an element in a list and returns a new list without that occurence. <span class="fixed">(todoTasks !! number)</span> (number is now <span class="fixed">1</span>) returns <span class="fixed">"Dust the dog"</span>. We bind <span class="fixed">todoTasks</span> without the first occurence of <span class="fixed">"Dust the dog"</span> to <span class="fixed">newTodoItems</span> and then join that into a single string with <span class="fixed">unlines</span> before writing it to the temporary file that we opened. The old file is now unchanged and the temporary file contains all the lines that the old one does, except the one we deleted.</p>
@@ -672,7 +672,7 @@ Which one do you want to delete?
 $ cat todo.txt
 Take salad out of the oven
 </pre>
-<a name="command-line-arguments"></a><h2><?=$contents[$_P[0]]['subchapters']['command-line-arguments']?></h2>
+<a name="command-line-arguments"></a><h2>Command line arguments</h2>
 <img src="images/arguments.png" alt="COMMAND LINE ARGUMENTS!!! ARGH" width="449" height="380" class="right">
 <p>Dealing with command line arguments is pretty much a necessity if you want to make a script or application that runs on a terminal. Luckily, Haskell's standard library has a nice way of getting command line arguments of a program.</p>
 <p>In the previous section, we made one program for adding a to-do item to our to-do list and one program for removing an item. There are two problems with the approach we took. The first one is that we just hardcoded the name of our to-do file in our code. We just decided that the file will be named <i>todo.txt</i> and that the user will never have a need for managing several to-do lists.</p>
@@ -681,9 +681,9 @@ Take salad out of the oven
 <p>The <span class="fixed">System.Environment</span> module has two cool I/O actions. One is <span class="label function">getArgs</span>, which has a type of <span class="fixed">getArgs :: IO [String]</span> and is an I/O action that will get the arguments that the program was run with and have as its contained result a list with the arguments. <span class="label function">getProgName</span> has a type of <span class="fixed">getProgName :: IO String</span> and is an I/O action that contains the program name.</p>
 <p>Here's a small program that demonstrates how these two work:</p>
 <pre name="code" class="haskell:hs">
- import System.Environment 
+ import System.Environment
  import Data.List
- 
+
  main = do
     args &lt;- getArgs
     progName &lt;- getProgName
@@ -691,7 +691,7 @@ Take salad out of the oven
     mapM putStrLn args
     putStrLn "The program name is:"
     putStrLn progName
-</pre> 
+</pre>
 <p>We bind <span class="fixed">getArgs</span> and <span class="fixed">progName</span> to <span class="fixed">args</span> and <span class="fixed">progName</span>. We say <span class="fixed">The arguments are:</span> and then for every argument in <span class="fixed">args</span>, we do <span class="fixed">putStrLn</span>. Finally, we also print out the program name. Let's compile this as <span class="fixed">arg-test</span>.</p>
 <pre name="code" class="plain">
 $ ./arg-test first second w00t "multi word arg"
@@ -714,7 +714,7 @@ arg-test
 <p>Our program will be made so that if we want to add the task <span class="fixed">Find the magic sword of power</span> to the file <i>todo.txt</i>, we have to punch in <span class="fixed">todo add todo.txt "Find the magic sword of power"</span> in our terminal. To view the tasks we'll just do <span class="fixed">todo view todo.txt</span> and to remove the task with the index of 2, we'll do <span class="fixed">todo remove todo.txt 2</span>.</p>
 <p>We'll start by making a dispatch association list. It's going to be a simple association list that has command line arguments as keys and functions as their corresponding values. All these functions will be of type <span class="fixed">[String] -&gt; IO ()</span>. They're going to take the argument list as a parameter and return an I/O action that does the viewing, adding, deleting, etc.</p>
 <pre name="code" class="haskell:hs">
-import System.Environment 
+import System.Environment
 import System.Directory
 import System.IO
 import Data.List
@@ -770,7 +770,7 @@ remove [fileName, numberString] = do
 <p>We opened up the file based on <span class="fixed">fileName</span> and opened a temporary file, deleted the line with the index that the user wants to delete, wrote that to the temporary file, removed the original file and renamed the temporary file back to <span class="fixed">fileName</span>.</p>
 <p>Here's the whole program at once, in all its glory!</p>
 <pre name="code" class="haskell:hs">
-import System.Environment 
+import System.Environment
 import System.Directory
 import System.IO
 import Data.List
@@ -780,7 +780,7 @@ dispatch =  [ ("add", add)
             , ("view", view)
             , ("remove", remove)
             ]
- 
+
 main = do
     (command:args) &lt;- getArgs
     let (Just action) = lookup command dispatch
@@ -837,7 +837,7 @@ $ ./todo view todo.txt
 </pre>
 <p>Another cool thing about this is that it's easy to add extra functionality. Just add an entry in the dispatch association list and implement the corresponding function and you're laughing! As an exercise, you can try implementing a <span class="fixed">bump</span> function that will take a file and a task number and return an I/O action that bumps that task to the top of the to-do list.</p>
 <p>You could make this program fail a bit more gracefully in case of bad input (for example, if someone runs <span class="fixed">todo UP YOURS HAHAHAHA</span>) by making an I/O action that just reports there has been an error (say, <span class="fixed">errorExit :: IO ()</span>) and then check for possible erronous input and if there is erronous input, perform the error reporting I/O action. Another way is to use exceptions, which we will meet soon.</p>
-<a name="randomness"></a><h2><?=$contents[$_P[0]]['subchapters']['randomness']?></h2>
+<a name="randomness"></a><h2>Randomness</h2>
 <img src="images/random.png" alt="this picture is the ultimate source of randomness and wackiness" width="358" height="362" class="right">
 <p>Many times while programming, you need to get some random data. Maybe you're making a game where a die needs to be thrown or you need to generate some test data to test out your program. There are a lot of uses for random data when programming. Well, actually, pseudo-random, because we all know that the only true source of randomness is a monkey on a unicycle with a cheese in one hand and its butt in the other. In this section, we'll take a look at how to make Haskell generate seemingly random data.</p>
 <p>In most other programming languages, you have functions that give you back some random number. Each time you call that function, you get back a (hopefully) different random number. How about Haskell? Well, remember, Haskell is a pure functional language. What that means is that it has referential transparency. What THAT means is that a function, if given the same parameters twice, must produce the same result twice. That's really cool because it allows us to reason differently about programs and it enables us to defer evaluation until we really need it. If I call a function, I can be sure that it won't do any funny stuff before giving me the results. All that matters are its results. However, this makes it a bit tricky for getting random numbers. If I have a function like this:</p>
@@ -888,7 +888,7 @@ ghci&gt; random (mkStdGen 949488) :: (Integer, StdGen)
 <p>We'll represent a coin with a simple <span class="fixed">Bool</span>. <span class="fixed">True</span> is tails, <span class="fixed">False</span> is heads.</p>
 <pre name="code" class="haskell:hs">
 threeCoins :: StdGen -&gt; (Bool, Bool, Bool)
-threeCoins gen = 
+threeCoins gen =
     let (firstCoin, newGen) = random gen
         (secondCoin, newGen') = random newGen
         (thirdCoin, newGen'') = random newGen'
@@ -925,12 +925,12 @@ randoms' gen = let (value, newGen) = random gen in value:randoms' newGen
 <pre name="code" class="haskell:hs">
 finiteRandoms :: (RandomGen g, Random a, Num n) =&gt; n -&gt; g -&gt; ([a], g)
 finiteRandoms 0 gen = ([], gen)
-finiteRandoms n gen = 
+finiteRandoms n gen =
     let (value, newGen) = random gen
         (restOfList, finalGen) = finiteRandoms (n-1) newGen
     in  (value:restOfList, finalGen)
 </pre>
-<p>Again, a recursive definition. We say that if we want 0 numbers, we just return an empty list and the generator that was given to us. For any other number of random values, we first get one random number and a new generator. That will be the head. Then we say that the tail will be <i>n - 1</i> numbers generated with the new generator. Then we return the head and the rest of the list joined and the final generator that we got from getting the <i>n - 1</i> random numbers.</p> 
+<p>Again, a recursive definition. We say that if we want 0 numbers, we just return an empty list and the generator that was given to us. For any other number of random values, we first get one random number and a new generator. That will be the head. Then we say that the tail will be <i>n - 1</i> numbers generated with the new generator. Then we return the head and the rest of the list joined and the final generator that we got from getting the <i>n - 1</i> random numbers.</p>
 <p>What if we want a random value in some sort of range? All the random integers so far were outrageously big or small. What if we want to to throw a die? Well, we use <span class="label function">randomR</span> for that purpose. It has a type of <span class="fixed">randomR :: (RandomGen g, Random a) :: (a, a) -&gt; g -&gt; (a, g)</span>, meaning that it's kind of like <span class="fixed">random</span>, only it takes as its first parameter a pair of values that set the lower and upper bounds and the final value produced will be within those bounds.<p>
 <pre name="code" class="haskell:hs">
 ghci&gt; randomR (1,6) (mkStdGen 359353)
@@ -990,11 +990,11 @@ main = do
 <pre name="code" class="haskell:hs">
 import System.Random
 
-main = do   
-    gen &lt;- getStdGen   
-    putStrLn $ take 20 (randomRs ('a','z') gen)   
+main = do
+    gen &lt;- getStdGen
+    putStrLn $ take 20 (randomRs ('a','z') gen)
     gen' &lt;- newStdGen
-    putStr $ take 20 (randomRs ('a','z') gen')   
+    putStr $ take 20 (randomRs ('a','z') gen')
 </pre>
 <p>Not only do we get a new random generator when we bind <span class="fixed">newStdGen</span> to something, the global one gets updated as well, so if we do <span class="fixed">getStdGen</span> again and bind it to something, we'll get a generator that's not the same as <span class="fixed">gen</span>.</p>
 <p>Here's a little program that will make the user guess which number it's thinking of.</p>
@@ -1013,7 +1013,7 @@ askForNumber gen = do
     numberString &lt;- getLine
     when (not $ null numberString) $ do
         let number = read numberString
-        if randNumber == number 
+        if randNumber == number
             then putStrLn "You are correct!"
             else putStrLn $ "Sorry, it was " ++ show randNumber
         askForNumber newGen
@@ -1044,7 +1044,7 @@ import Control.Monad(when)
 
 main = do
     gen &lt;- getStdGen
-    let (randNumber, _) = randomR (1,10) gen :: (Int, StdGen)   
+    let (randNumber, _) = randomR (1,10) gen :: (Int, StdGen)
     putStr "Which number in the range from 1 to 10 am I thinking of? "
     numberString &lt;- getLine
     when (not $ null numberString) $ do
@@ -1056,7 +1056,7 @@ main = do
         main
 </pre>
 <p>It's very similar to the previous version, only instead of making a function that takes a generator and then calls itself recursively with the new updated generator, we do all the work in <span class="fixed">main</span>. After telling the user whether they were correct in their guess or not, we update the global generator and then call <span class="fixed">main</span> again. Both approaches are valid but I like the first one more since it does less stuff in <span class="fixed">main</span> and also provides us with a function that we can reuse easily.</p>
-<a name="bytestrings"></a><h2><?=$contents[$_P[0]]['subchapters']['bytestrings']?></h2>
+<a name="bytestrings"></a><h2>Bytestrings</h2>
 <img src="images/chainchomp.png" alt="like normal string, only they byte ... what a pedestrian pun this is" class="right" width="306" height="390">
 <p>Lists are a cool and useful data structure. So far, we've used them pretty much everywhere. There are a multitude of functions that operate on them and Haskell's laziness allows us to exchange the for and while loops of other languages for filtering and mapping over lists, because evaluation will only happen once it really needs to, so things like infinite lists (and even infinite lists of infinite lists!) are no problem for us. That's why lists can also be used to represent streams, either when reading from the standard input or when reading from files. We can just open a file and read it as a string, even though it will only be accessed when the need arises.</p>
 <p>However, processing files as strings has one drawback: it tends to be slow. As you know, <span class="fixed">String</span> is a type synonym for <span class="fixed">[Char]</span>. <span class="fixed">Char</span>s don't have a fixed size, because it takes several bytes to represent a character from, say, Unicode. Furthemore, lists are really lazy. If you have a list like <span class="fixed">[1,2,3,4]</span>, it will be evaluated only when completely necessary. So the whole list is sort of a promise of a list. Remember that <span class="fixed">[1,2,3,4]</span> is syntactic sugar for <span class="fixed">1:2:3:4:[]</span>. When the first element of the list is forcibly evaluated (say by printing it), the rest of the list <span class="fixed">2:3:4:[]</span> is still just a promise of a list, and so on. So you can think of lists as promises that the next element will be delivered once it really has to and along with it, the promise of the element after it. It doesn't take a big mental leap to conclude that processing a simple list of numbers as a series of promises might not be the most efficient thing in the world.</p>
@@ -1079,7 +1079,7 @@ Chunk "bcdefghijklmnopqrstuvwx" Empty
 </pre>
 <p>As you can see, you usually don't have to worry about the <span class="fixed">Word8</span> too much, because the type system can makes the numbers choose that type. If you try to use a big number, like <span class="fixed">336</span> as a <span class="fixed">Word8</span>, it will just wrap around to <span class="fixed">80</span>.</p>
 <p>We packed only a handful of values into a <span class="fixed">ByteString</span>, so they fit inside one chunk. The <span class="fixed">Empty</span> is like the <span class="fixed">[]</span> for lists.</p>
-<p><span class="label function">unpack</span> is the inverse function of <span class="fixed">pack</span>. It takes a bytestring and turns it into a list of bytes.</p> 
+<p><span class="label function">unpack</span> is the inverse function of <span class="fixed">pack</span>. It takes a bytestring and turns it into a list of bytes.</p>
 <p><span class="label function">fromChunks</span> takes a list of strict bytestrings and converts it to a lazy bytestring. <span class="label function">toChunks</span> takes a lazy bytestring and converts it to a list of strict ones.</p>
 <pre name="code" class="haskell:hs">
 ghci&gt; B.fromChunks [S.pack [40,41,42], S.pack [43,44,45], S.pack [46,47,48]]
@@ -1120,8 +1120,8 @@ copyFile source dest = do
 $ runhaskell bytestringcopy.hs something.txt ../../something.txt
 </pre>
 <p>Notice that a program that doesn't use bytestrings could look just like this, the only difference is that we used <span class="fixed">B.readFile</span> and <span class="fixed">B.writeFile</span> instead of <span class="fixed">readFile</span> and <span class="fixed">writeFile</span>. Many times, you can convert a program that uses normal strings to a program that uses bytestrings by just doing the necessary imports and then putting the qualified module names in front of some functions. Sometimes, you have to convert functions that you wrote to work on strings so that they work on bytestrings, but that's not hard.</p>
-<p>Whenever you need better performance in a program that reads a lot of data into strings, give bytestrings a try, chances are you'll get some good performance boosts with very little effort on your part. I usually write programs by using normal strings and then convert them to use bytestrings if the performance is not satisfactory.</p> 
-<a name="exceptions"></a><h2><?=$contents[$_P[0]]['subchapters']['exceptions']?></h2>
+<p>Whenever you need better performance in a program that reads a lot of data into strings, give bytestrings a try, chances are you'll get some good performance boosts with very little effort on your part. I usually write programs by using normal strings and then convert them to use bytestrings if the performance is not satisfactory.</p>
+<a name="exceptions"></a><h2>Exceptions</h2>
 <img src="images/timber.png" class="left" alt="timberr!!!!" width="308" height="394">
 <p>All languages have procedures, functions, and pieces of code that might fail in some way. That's just a fact of life. Different languages have different ways of handling those failures. In C, we usually use some abnormal return value (like <span class="fixed">-1</span> or a null pointer) to indicate that what a function returned shouldn't be treated like a normal value. Java and C#, on the other hand, tend to use exceptions to handle failure. When an exception is thrown, the control flow jumps to some code that we've defined that does some cleanup and then maybe re-throws the exception so that some other error handling code can take care of some other stuff.</p>
 <p>Haskell has a very good type system. Algebraic data types allow for types like <span class="fixed">Maybe</span> and <span class="fixed">Either</span> and we can use values of those types to represent results that may be there or not. In C, returning, say, <span class="fixed">-1</span> on failure is completely a matter of convention. It only has special meaning to humans. If we're not careful, we might treat these abnormal values as ordinary ones and then they can cause havoc and dismay in our code. Haskell's type system gives us some much-needed safety in that aspect. A function <span class="fixed">a -&gt; Maybe b</span> clearly indicates that it it may produce a <span class="fixed">b</span> wrapped in <span class="fixed">Just</span> or that it may return <span class="fixed">Nothing</span>. The type is different from just plain <span class="fixed">a -&gt; b</span> and if we try to use those two functions interchangeably, the compiler will complain at us.</p>
@@ -1176,7 +1176,7 @@ import System.IO
 import System.IO.Error
 
 main = toTry `catch` handler
-            
+
 toTry :: IO ()
 toTry = do (fileName:_) &lt;- getArgs
            contents &lt;- readFile fileName
@@ -1201,7 +1201,7 @@ import System.IO
 import System.IO.Error
 
 main = toTry `catch` handler
-            
+
 toTry :: IO ()
 toTry = do (fileName:_) &lt;- getArgs
            contents &lt;- readFile fileName
@@ -1236,25 +1236,25 @@ handler e
     | otherwise = ioError e
 </pre>
 <p>Where <span class="fixed">notifyCops</span> and <span class="fixed">freeSomeSpace</span> are some I/O actions that you define. Be sure to re-throw exceptions if they don't match any of your criteria, otherwise you're causing your program to fail silently in some cases where it shouldn't.</p>
-<p><span class="fixed">System.IO.Error</span> also exports functions that enable us to ask our exceptions for some attributes, like what the handle of the file that caused the error is, or what the filename is. These start with <span class="fixed">ioe</span> and you can see a <a href="http://www.haskell.org/ghc/docs/6.10.1/html/libraries/base/System-IO-Error.html#3">full list of them</a> in the documentation. Say we want to print the filename that caused our error. We can't print the <span class="fixed">filaName</span> that we got from <span class="fixed">getArgs</span>, because only the <span class="fixed">IOError</span> is passed to the handler and the handler doesn't know about anything else. A function depends only on the parameters it was called with. That's why we can use the <span class="label function">ioeGetFileName</span> function, which has a type of <span class="fixed">ioeGetFileName :: IOError -&gt; Maybe FilePath</span>. It takes an <span class="fixed">IOError</span> as a parameter and maybe returns a <span class="fixed">FilePath</span> (which is just a type synonym for <span class="fixed">String</span>, remember, so it's kind of the same thing). Basically, what it does is it extracts the file path from the <span class="fixed">IOError</span>, if it can. Let's modify our program to print out the file path that's responsible for the exception occurring.
+<p><span class="fixed">System.IO.Error</span> also exports functions that enable us to ask our exceptions for some attributes, like what the handle of the file that caused the error is, or what the filename is. These start with <span class="fixed">ioe</span> and you can see a <a href="http://www.haskell.org/ghc/docs/6.10.1/html/libraries/base/System-IO-Error.html#3">full list of them</a> in the documentation. Say we want to print the filename that caused our error. We can't print the <span class="fixed">fileName</span> that we got from <span class="fixed">getArgs</span>, because only the <span class="fixed">IOError</span> is passed to the handler and the handler doesn't know about anything else. A function depends only on the parameters it was called with. That's why we can use the <span class="label function">ioeGetFileName</span> function, which has a type of <span class="fixed">ioeGetFileName :: IOError -&gt; Maybe FilePath</span>. It takes an <span class="fixed">IOError</span> as a parameter and maybe returns a <span class="fixed">FilePath</span> (which is just a type synonym for <span class="fixed">String</span>, remember, so it's kind of the same thing). Basically, what it does is it extracts the file path from the <span class="fixed">IOError</span>, if it can. Let's modify our program to print out the file path that's responsible for the exception occurring.
 <pre name="code" class="haskell:hs">
-import System.Environment   
-import System.IO   
-import System.IO.Error   
-  
-main = toTry `catch` handler   
-               
-toTry :: IO ()   
-toTry = do (fileName:_) &lt;- getArgs   
-           contents &lt;- readFile fileName   
-           putStrLn $ "The file has " ++ show (length (lines contents)) ++ " lines!"   
-  
-handler :: IOError -&gt; IO ()   
-handler e   
-    | isDoesNotExistError e = 
+import System.Environment
+import System.IO
+import System.IO.Error
+
+main = toTry `catch` handler
+
+toTry :: IO ()
+toTry = do (fileName:_) &lt;- getArgs
+           contents &lt;- readFile fileName
+           putStrLn $ "The file has " ++ show (length (lines contents)) ++ " lines!"
+
+handler :: IOError -&gt; IO ()
+handler e
+    | isDoesNotExistError e =
         case ioeGetFileName e of Just path -&gt; putStrLn $ "Whoops! File does not exist at: " ++ path
                                  Nothing -&gt; putStrLn "Whoops! File does not exist at unknown location!"
-    | otherwise = ioError e   
+    | otherwise = ioError e
 </pre>
 <p>In the guard where <span class="fixed">isDoesNotExistError</span> is <span class="fixed">True</span>, we used a <i>case</i> expression to call <span class="fixed">ioeGetFileName</span> with <span class="fixed">e</span> and then pattern match against the <span class="fixed">Maybe</span> value that it returned. Using <i>case</i> expressions is commonly used when you want to pattern match against something without bringing in a new function.</p>
 <p>You don't have to use one handler to <span class="fixed">catch</span> exceptions in your whole I/O part. You can just cover certain parts of your I/O code with <span class="fixed">catch</span> or you can cover several of them with <span class="fixed">catch</span> and use different handlers for them, like so:</p>
