@@ -56,7 +56,7 @@ data Shape = Circle Float Float Float | Rectangle Float Float Float Float derivi
 </pre>
 <p>Nebudeme se teď tím zabývat dopodrobna. Řekněme, že když napíšeme <span class="fixed">deriving (Show)</span> na konec deklarace <i>data</i>, Haskell automaticky zahrne typ do typové třídy <span class="fixed">Show</span>. Tím pádem teď můžeme udělat tohle:</p>
 <pre name="code" class="haskell:hs">
-ghci&gt; C<F2>ircle 10 20 5
+ghci&gt; Circle 10 20 5
 Circle 10.0 20.0 5.0
 ghci&gt; Rectangle 50 230 60 90
 Rectangle 50.0 230.0 60.0 90.0
