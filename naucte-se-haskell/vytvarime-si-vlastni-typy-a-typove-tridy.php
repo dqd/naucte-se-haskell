@@ -16,7 +16,7 @@ Ty určují přípustné hodnoty typu. Znak <span class="fixed">|</span> se čte
 <pre name="code" class="haskell:hs">
 data Int = -2147483648 | -2147483647 | … | -1 | 0 | 1 | 2 | … | 2147483647
 </pre>
-<img src="images/http://s3.amazonaws.com/lyah/caveman.png" alt="caveman" class="left" width="220" height="215">
+<img src="images/caveman.png" alt="caveman" class="left" width="220" height="215">
 <p>První a poslední datový konstruktor jsou nejnižší a nejvyšší možné hodnoty typu <span class="fixed">Int</span>. Ve skutečnosti se takto nedefinují; trojtečky nahrazují hromadu čísel a máme to zde uvedeno pouze pro ilustraci.</p>
 <p>Pojďme se nyní zamyslet nad tím, jak bychom vyjádřili tvary v Haskellu. Jednou možností je použití n-tic. Kružnici bychom zapsali jako  <span class="fixed">(43.1, 55.0, 10.4)</span>, kde první a druhá složka jsou souřadnice středu kružnice a třetí je její poloměr. To vypadá nadějně, ale stejná čísla mohou také vyjadřovat třírozměrný vektor nebo cokoliv jiného. Lepším způsobem je vytvoření vlastního typu pro prezentaci tvaru. Řekněme, že tvarem bude kružnice, nebo obdélník. Tady to máme:</p>
 
@@ -131,7 +131,7 @@ module Shapes
 <div class="translation">Tady <a href="http://dqd.cz/">překladatel</a> prozatím skončil. Můžete navštívit IRC kanál <a href="irc://irc.freenode.net/haskell.cz">#haskell.cz</a> a povzbudit ho, případně přímo přispět překladem na <a href="https://github.com/dqd/naucte-se-haskell">githubu</a>.</div>
 
 <a name="zaznamy"></a><h2><?=$contents[$_P[0]]['subchapters']['zaznamy']?></h2>
-<img src="images/http://s3.amazonaws.com/lyah/record.png" alt="record" class="right" width="208" height="97">
+<img src="images/record.png" alt="record" class="right" width="208" height="97">
 <p>OK, we've been tasked with creating a data type that describes a person. The info that we want to store about that person is: first name, last name, age, height, phone number, and favorite ice-cream flavor. I don't know about you, but that's all I ever want to know about a person. Let's give it a go!</p>
 <pre name="code" class="haskell:hs">
 data Person = Person String String Int Float String String deriving (Show)
@@ -219,7 +219,7 @@ Car {company = "Ford", model = "Mustang", year = 1967}
 <pre name="code" class="haskell:hs">
 data Maybe a = Nothing | Just a
 </pre>
-<img src="images/http://s3.amazonaws.com/lyah/yeti.png" alt="yeti" class="left" width="209" height="260">
+<img src="images/yeti.png" alt="yeti" class="left" width="209" height="260">
 <p>The <span class="fixed">a</span> here is the type parameter. And because there's a type parameter involved, we call <span class="fixed">Maybe</span> a type constructor. Depending on what we want this data type to hold when it's not <span class="fixed">Nothing</span>, this type constructor can end up producing a type of <span class="fixed">Maybe Int</span>, <span class="fixed">Maybe Car</span>, <span class="fixed">Maybe String</span>, etc. No value can have a type of just <span class="fixed">Maybe</span>, because that's not a type per se, it's a type constructor. In order for this to be a real type that a value can be part of, it has to have all its type parameters filled up.</p>
 
 <p>So if we pass <span class="fixed">Char</span> as the type parameter to <span class="fixed">Maybe</span>, we get a type of <span class="fixed">Maybe Char</span>. The value <span class="fixed">Just 'a'</span> has a type of <span class="fixed">Maybe Char</span>, for example.</p>
@@ -288,7 +288,7 @@ Car "Ford" "Mustang" 1967 :: (Num t) =&gt; Car [Char] [Char] t
 ghci&gt; :t Car "Ford" "Mustang" "nineteen sixty seven"
 Car "Ford" "Mustang" "nineteen sixty seven" :: Car [Char] [Char] [Char]
 </pre>
-<img src="images/http://s3.amazonaws.com/lyah/meekrat.png" alt="meekrat" class="right" width="150" height="267">
+<img src="images/meekrat.png" alt="meekrat" class="right" width="150" height="267">
 <p>In real life though, we'd end up using <span class="fixed">Car String String Int</span> most of the time and so it would seem that parameterizing the <span class="fixed">Car</span> type isn't really worth it. We usually use type parameters when the type that's contained inside the data type's various value constructors isn't really that important for the type to work. A list of stuff is a list of stuff and it doesn't matter what the type of that stuff is, it can still work. If we want to sum a list of numbers, we can specify later in the summing function that we specifically want a list of numbers. Same goes for <span class="fixed">Maybe</span>. <span class="fixed">Maybe</span> represents an option of either having nothing or having one of something. It doesn't matter what the type of that something is.</p>
 
 <p>Another example of a parameterized type that we've already met is <span class="fixed">Map k v</span> from <span class="fixed">Data.Map</span>. The <span class="fixed">k</span> is the type of the keys in a map and the <span class="fixed">v</span> is the type of the values. This is a good example of where type parameters are very useful. Having maps parameterized enables us to have mappings from any type to any other type, as long as the type of the key is part of the <span class="fixed">Ord</span> typeclass. If we were defining a mapping type, we could add a typeclass constraint in the <i>data</i> declaration:</p>
@@ -330,7 +330,7 @@ ghci&gt; Vector 2 9 3 `vectMult` (Vector 4 9 5 `scalarMult` Vector 9 2 4)
 Vector 148 666 222
 </pre>
 <a name="derived-instances"></a><h2>Derived instances</h2>
-<img src="images/http://s3.amazonaws.com/lyah/gob.png" alt="gob" class="right" width="112" height="350">
+<img src="images/gob.png" alt="gob" class="right" width="112" height="350">
 <p>In the <a href="types-and-typeclasses#typeclasses-101">Typeclasses 101</a> section, we explained the basics of typeclasses. We explained that a typeclass is a sort of an interface that defines some behavior. A type can be made an <em>instance</em> of a typeclass if it supports that behavior. Example: the <span class="fixed">Int</span> type is an instance of the <span class="fixed">Eq</span> typeclass because the <span class="fixed">Eq</span> typeclass defines behavior for stuff that can be equated. And because integers can be equated, <span class="fixed">Int</span> is a part of the <span class="fixed">Eq</span> typeclass. The real usefulness comes with the functions that act as the interface for <span class="fixed">Eq</span>, namely <span class="fixed">==</span> and <span class="fixed">/=</span>. If a type is a part of the <span class="fixed">Eq</span> typeclass, we can use the <span class="fixed">==</span> functions with values of that type. That's why expressions like <span class="fixed">4 == 4</span> and <span class="fixed">"foo" /= "bar"</span> typecheck.</p>
 
 <p>We also mentioned that they're often confused with classes in languages like Java, Python, C++ and the like, which then baffles a lot of people. In those languages, classes are a blueprint from which we then create objects that contain state and can do some actions. Typeclasses are more like interfaces. We don't make data from typeclasses. Instead, we first make our data type and then we think about what it can act like. If it can act like something that can be equated, we make it an instance of the <span class="fixed">Eq</span> typeclass. If it can act like something that can be ordered, we make it an instance of the <span class="fixed">Ord</span> typeclass.</p>
@@ -501,7 +501,7 @@ ghci&gt; [minBound .. maxBound] :: [Day]
  <pre name="code" class="haskell:hs">
  type String = [Char]
  </pre>
- <img src="images/http://s3.amazonaws.com/lyah/chicken.png" alt="chicken" class="left" width="169" height="225">
+ <img src="images/chicken.png" alt="chicken" class="left" width="169" height="225">
  <p>
  We've introduced the <i>type</i> keyword. The keyword might be misleading to some, because we're not actually making anything new (we did that with the <i>data</i> keyword), but we're just making a synonym for an already existing type.
  </p>
@@ -629,7 +629,7 @@ Right "QOTSA"
 </pre>
 <p>We could have used a <span class="fixed">Maybe a</span> to represent the result but then we wouldn't know why we couldn't get the code. But now, we have information about the failure in our result type.</p>
 <a name="recursive-data-structures"></a><h2>Recursive data structures</h2>
-<img src="images/http://s3.amazonaws.com/lyah/thefonz.png" alt="the fonz" class="right" width="168" height="301">
+<img src="images/thefonz.png" alt="the fonz" class="right" width="168" height="301">
 <p>As we've seen, a constructor in an algebraic data type can have several (or none at all) fields and each field must be of some concrete type. With that in mind, we can make types whose constructors have fields that are of the same type! Using that, we can create recursive data types, where one value of some type contains values of that type, which in turn contain more values of the same type and so on.</p>
 <p>Think about this list: <span class="fixed">[5]</span>. That's just syntactic sugar for <span class="fixed">5:[]</span>. On the left side of the <span class="fixed">:</span>, there's a value and on the right side, there's a list. And in this case, it's an empty list. Now how about the list <span class="fixed">[4,5]</span>? Well, that desugars to <span class="fixed">4:(5:[])</span>. Looking at the first <span class="fixed">:</span>, we see that it also has an element on its left side and a list (<span class="fixed">5:[]</span>) on its right side. Same goes for a list like <span class="fixed">3:(4:(5:6:[]))</span>, which could be written either like that or like <span class="fixed">3:4:5:6:[]</span> (because <span class="fixed">:</span> is right-associative) or <span class="fixed">[3,4,5,6]</span>.</p>
 
@@ -699,7 +699,7 @@ ghci&gt; a .++ b
 <p>Nice. Is nice. If we wanted, we could implement all of the functions that operate on lists on our own list type.</p>
 <p>Notice how we pattern matched on <span class="fixed">(x :-: xs)</span>. That works because pattern matching is actually about matching constructors. We can match on <span class="fixed">:-:</span> because it is a constructor for our own list type and we can also match on <span class="fixed">:</span> because it is a constructor for the built-in list type. Same goes for <span class="fixed">[]</span>. Because pattern matching works (only) on constructors, we can match for stuff like that, normal prefix constructors or stuff like <span class="fixed">8</span> or <span class="fixed">'a'</span>, which are basically constructors for the numeric and character types, respectively.</p>
 
-<img src="images/http://s3.amazonaws.com/lyah/binarytree.png" alt="binary search tree" class="left" width="323" height="225">
+<img src="images/binarytree.png" alt="binary search tree" class="left" width="323" height="225">
 <p>Now, we're going to implement a <em>binary search tree</em>. If you're not familiar with binary search trees from languages like C, here's what they are: an element points to two elements, one on its left and one on its right. The element to the left is smaller, the element to the right is bigger. Each of those elements can also point to two elements (or one, or none). In effect, each element has up to two sub-trees. And a cool thing about binary search trees is that we know that all the elements at the left sub-tree of, say, 5 are going to be smaller than 5. Elements in its right sub-tree are going to be bigger. So if we need to find if 8 is in our tree, we'd start at 5 and then because 8 is greater than 5, we'd go right. We're now at 7 and because 8 is greater than 7, we go right again. And we've found our element in three hops! Now if this were a normal list (or a tree, but really unbalanced), it would take us seven hops instead of three to see if 8 is in there.</p>
 <p>Sets and maps from <span class="fixed">Data.Set</span> and <span class="fixed">Data.Map</span> are implemented using trees, only instead of normal binary search trees, they use balanced binary search trees, which are always balanced. But right now, we'll just be implementing normal binary search trees.</p>
 <p>Here's what we're going to say: a tree is either an empty tree or it's an element that contains some value and two trees. Sounds like a perfect fit for an algebraic data type!</p>
@@ -756,7 +756,7 @@ False
 <p>So as you can see, algebraic data structures are a really cool and powerful concept in Haskell. We can use them to make anything from boolean values and weekday enumerations to binary search trees and more!</p>
 
 <a name="typeclasses-102"></a><h2>Typeclasses 102</h2>
-<img src="images/http://s3.amazonaws.com/lyah/trafficlight.png" alt="tweet" class="right" width="175" height="480">
+<img src="images/trafficlight.png" alt="tweet" class="right" width="175" height="480">
 <p>So far, we've learned about some of the standard Haskell typeclasses and we've seen which types are in them. We've also learned how to automatically make our own types instances of the standard typeclasses by asking Haskell to derive the instances for us. In this section, we're going to learn how to make our own typeclasses and how to make types instances of them by hand.</p>
 <p>A quick recap on typeclasses: typeclasses are like interfaces. A typeclass defines some behavior (like comparing for equality, comparing for ordering, enumeration) and then types that can behave in that way are made instances of that typeclass. The behavior of typeclasses is achieved by defining functions or just type declarations that we then implement. So when we say that a type is an instance of a typeclass, we mean that we can use the functions that the typeclass defines with that type.</p>
 <p>Typeclasses have pretty much nothing to do with classes in languages like Java or Python. This confuses many people, so I want you to forget everything you know about classes in imperative languages right now.</p>
@@ -870,7 +870,7 @@ instance (Eq m) =&gt; Eq (Maybe m) where
 <p>Ooh, one more thing, check this out! If you want to see what the instances of a typeclass are, just do <span class="fixed">:info YourTypeClass</span> in GHCI. So typing <span class="fixed">:info Num</span> will show which functions the typeclass defines and it will give you a list of the types in the typeclass. <span class="fixed">:info</span> works for types and type constructors too. If you do <span class="fixed">:info Maybe</span>, it will show you all the typeclasses that <span class="fixed">Maybe</span> is an instance of. Also <span class="fixed">:info</span> can show you the type declaration of a function. I think that's pretty cool.</p>
 
 <a name="a-yes-no-typeclass"></a><h2>A yes-no typeclass</h2>
-<img src="images/http://s3.amazonaws.com/lyah/yesno.png" alt="yesno" class="left" width="201" height="111">
+<img src="images/yesno.png" alt="yesno" class="left" width="201" height="111">
 <p>In JavaScript and some other weakly typed languages, you can put almost anything inside an if expression. For example, you can do all of the following: <span class="fixed">if (0) alert("YEAH!") else alert("NO!")</span>, <span class="fixed">if ("") alert ("YEAH!") else alert("NO!")</span>, <span class="fixed">if (false) alert("YEAH") else alert("NO!)</span>, etc. and all of these will throw an alert of <span class="fixed">NO!</span>. If you do <span class="fixed">if ("WHAT") alert ("YEAH") else alert("NO!")</span>, it will alert a <span class="fixed">"YEAH!"</span> because JavaScript considers non-empty strings to be a sort of true-ish value.</p>
 
 <p>Even though strictly using <span class="fixed">Bool</span> for boolean semantics works better in Haskell, let's try and implement that JavaScript-ish behavior anyway. For fun! Let's start out with a <i>class</i> declaration.</p>
@@ -969,7 +969,7 @@ ghci&gt; yesnoIf Nothing "YEAH!" "NO!"
 class Functor f where
     fmap :: (a -&gt; b) -&gt; f a -&gt; f b
 </pre>
-<img src="images/http://s3.amazonaws.com/lyah/functor.png" alt="I AM FUNCTOOOOR!!!" class="right" width="220" height="441">
+<img src="images/functor.png" alt="I AM FUNCTOOOOR!!!" class="right" width="220" height="441">
 <p>Alright. We see that it defines one function, <span class="fixed">fmap</span>, and doesn't provide any default implementation for it. The type of <span class="fixed">fmap</span> is interesting. In the definitions of typeclasses so far, the type variable that played the role of the type in the typeclass was a concrete type, like the <span class="fixed">a</span> in <span class="fixed">(==) :: (Eq a) =&gt; a -&gt; a -&gt; Bool</span>. But now, the <span class="fixed">f</span> is not a concrete type (a type that a value can hold, like <span class="fixed">Int</span>, <span class="fixed">Bool</span> or <span class="fixed">Maybe String</span>), but a type constructor that takes one type parameter. A quick refresher example: <span class="fixed">Maybe Int</span> is a concrete type, but <span class="fixed">Maybe</span> is a type constructor that takes one type as the parameter. Anyway, we see that <span class="fixed">fmap</span> takes a function from one type to another and a functor applied with one type and returns a functor applied with another type.</p>
 
 <p>If this sounds a bit confusing, don't worry. All will be revealed soon when we check out a few examples. Hmm, this type declaration for <span class="fixed">fmap</span> reminds me of something. If you don't know what the type signature of <span class="fixed">map</span> is, it's: <span class="fixed">map :: (a -&gt; b) -&gt; [a] -&gt; [b]</span>.</p>
@@ -1047,7 +1047,7 @@ data Either a b = Left a | Right b
 <div class="hintbox"><em>Just one more thing!</em> Functors should obey some laws so that they may have some properties that we can depend on and not think about too much. If we use <span class="fixed">fmap (+1)</span> over the list <span class="fixed">[1,2,3,4]</span>, we expect the result to be <span class="fixed">[2,3,4,5]</span> and not its reverse, <span class="fixed">[5,4,3,2]</span>. If we use <span class="fixed">fmap (\a -&gt; a)</span> (the identity function, which just returns its parameter) over some list, we expect to get back the same list as a result. For example, if we gave the wrong functor instance to our <span class="fixed">Tree</span> type, using <span class="fixed">fmap</span> over a tree where the left sub-tree of a node only has elements that are smaller than the node and the right sub-tree only has nodes that are larger than the node might produce a tree where that's not the case. We'll go over the functor laws in more detail in one of the next chapters.</div>
 
 <a name="kinds-and-some-type-foo"></a><h2>Kinds and some type-foo</h2>
-<img src="images/http://s3.amazonaws.com/lyah/typefoo.png" alt="TYPE FOO MASTER" class="right" width="287" height="400">
+<img src="images/typefoo.png" alt="TYPE FOO MASTER" class="right" width="287" height="400">
 <p>Type constructors take other types as parameters to eventually produce concrete types. That kind of reminds me of functions, which take values as parameters to produce values. We've seen that type constructors can be partially applied (<span class="fixed">Either String</span> is a type that takes one type and produces a concrete type, like <span class="fixed">Either String Int</span>), just like functions can. This is all very interesting indeed. In this section, we'll take a look at formally defining how types are applied to type constructors, just like we took a look at formally defining how values are applied to functions by using type declarations. <em>You don't really have to read this section to continue on your magical Haskell quest</em> and if you don't understand it, don't worry about it. However, getting this will give you a very thorough understanding of the type system.</p>
 <p>So, values like <span class="fixed">3</span>, <span class="fixed">"YEAH"</span> or <span class="fixed">takeWhile</span> (functions are also values, because we can pass them around and such) each have their own type. Types are little labels that values carry so that we can reason about the values. But types have their own little labels, called <em>kinds</em>. A kind is more or less the type of a type. This may sound a bit weird and confusing, but it's actually a really cool concept.</p>
 
